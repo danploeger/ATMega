@@ -11,7 +11,11 @@
 
 void lcdDriver_init() 
 {
-	DDRD |= ((1 << DISPLAY_CS_PIN) | (1 << DISPLAY_WR_PIN) | (1 << DISPLAY_RD_PIN) | (1 << DISPLAY_A0_PIN) );
+//	DDRD |= ((1 << DISPLAY_CS_PIN) | (1 << DISPLAY_WR_PIN) | (1 << DISPLAY_RD_PIN) | (1 << DISPLAY_A0_PIN) );
+	DDR(DISPLAY_CS_PORT) |= (1 << DISPLAY_CS_PIN);
+	DDR(DISPLAY_WR_PORT) |= (1 << DISPLAY_WR_PIN);
+	DDR(DISPLAY_RD_PORT) |= (1 << DISPLAY_RD_PIN);
+	DDR(DISPLAY_A0_PORT) |= (1 << DISPLAY_A0_PIN);
 	DISPLAY_WR_PORT |= (1 << DISPLAY_WR_PIN);
 	DISPLAY_RD_PORT |= (1 << DISPLAY_RD_PIN);
 	
@@ -31,46 +35,50 @@ void lcdDriver_init()
 ****************************************************/
 void lcdDriver_writeData(uint8_t data) 
 {
-	DISPLAY_WR_PORT |= (1 << DISPLAY_A0_PIN);
-	DISPLAY_WR_PORT &= ~(1 << DISPLAY_RD_PIN);
+	DDR(DISPLAY_DATA_PORT) = 0xFF;
+	DISPLAY_A0_PORT |= (1 << DISPLAY_A0_PIN);
 	DISPLAY_WR_PORT |= (1 << DISPLAY_WR_PIN);
 	
 	// write
+	DISPLAY_WR_PORT &= ~(1 << DISPLAY_WR_PIN);
 	DISPLAY_DATA_PORT = data;
 	
 	
 	// wait 160 ns
-	asm("NOP");
-	asm("NOP");
-	asm("NOP");
-	
+	_delay_us(1);
+//	asm("NOP");
+//	asm("NOP");
+//	asm("NOP");
+//
 
 	// finalize operation
-	DISPLAY_WR_PORT &= ~(1 << DISPLAY_WR_PIN);
 	DISPLAY_WR_PORT |= (1 << DISPLAY_WR_PIN);
+	DISPLAY_A0_PORT &= ~(1 << DISPLAY_A0_PIN);
 	
 }
 
 void lcdDriver_writeCommand(uint8_t data)
 {
-	DISPLAY_WR_PORT &= ~(1 << DISPLAY_A0_PIN);
-	DISPLAY_WR_PORT &= ~(1 << DISPLAY_RD_PIN);
+	DDR(DISPLAY_DATA_PORT) = 0xFF;
+	DISPLAY_A0_PORT &= ~(1 << DISPLAY_A0_PIN);
 	DISPLAY_WR_PORT |= (1 << DISPLAY_WR_PIN);
 	
 	// write
+	DISPLAY_WR_PORT &= ~(1 << DISPLAY_WR_PIN);
 	DISPLAY_DATA_PORT = data;
 	
 	
 	// wait 160 ns
-	asm("NOP");
-	asm("NOP");
-	asm("NOP");
+	_delay_us(1);
+//	asm("NOP");
+//	asm("NOP");
+//	asm("NOP");
 		
 
 	
 	// finalize operation
-	DISPLAY_WR_PORT &= ~(1 << DISPLAY_WR_PIN);
 	DISPLAY_WR_PORT |= (1 << DISPLAY_WR_PIN);
+	DISPLAY_A0_PORT &= ~(1 << DISPLAY_A0_PIN);
 }
 
 
@@ -100,18 +108,24 @@ void lcdDriver_selectController(uint8_t sel)
 /************************************************************************/
 uint8_t lcdDriver_readStatus()
 {
-	DISPLAY_RD_PORT &= ~(1 << DISPLAY_A0_PIN);
-	DISPLAY_RD_PORT |=  (1 << DISPLAY_RD_PIN);
-	DISPLAY_RD_PORT &= ~(1 << DISPLAY_WR_PIN);
+	uint8_t DATA;
+
+	DDR(DISPLAY_DATA_PORT) = 0x00;
+	DISPLAY_A0_PORT &= ~(1 << DISPLAY_A0_PIN);
+	DISPLAY_RD_PORT |= (1 << DISPLAY_RD_PIN);
+
+	// read
+	DISPLAY_RD_PORT &= ~(1 << DISPLAY_RD_PIN);
+	DATA = DISPLAY_DATA_PORT;
 	
 	// wait 180 ns
-	asm("nop");
-	asm("nop");
-	asm("nop");
+	_delay_us(1);
+//	asm("nop");
+//	asm("nop");
+//	asm("nop");
 	
 	// finalize operation
-	DISPLAY_RD_PORT &= ~(1 << DISPLAY_RD_PIN);
 	DISPLAY_RD_PORT |=  (1 << DISPLAY_RD_PIN);
 
-	return DISPLAY_DATA_PORT;
+	return DATA;
 }
