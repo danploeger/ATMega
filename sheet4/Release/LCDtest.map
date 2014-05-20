@@ -141,7 +141,7 @@ LOAD c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x9a6
+.text           0x00000000      0x99a
  *(.vectors)
  .vectors       0x00000000      0x120 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51/crtm128rfa1.o
                 0x00000000                __vectors
@@ -289,87 +289,87 @@ LOAD c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a
  .text          0x000002da        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(ultoa_invert.o)
                 0x000002da                . = ALIGN (0x2)
  *(.text.*)
- .text.main     0x000002da       0x66 ./src/lcdtest.o
+ .text.main     0x000002da       0x5a ./src/lcdtest.o
                 0x000002da                main
  .text.lcdDriver_init
-                0x00000340       0x10 ./src/ses_lcdDriver.o
-                0x00000340                lcdDriver_init
+                0x00000334       0x10 ./src/ses_lcdDriver.o
+                0x00000334                lcdDriver_init
  .text.lcdDriver_writeData
-                0x00000350       0x16 ./src/ses_lcdDriver.o
-                0x00000350                lcdDriver_writeData
+                0x00000344       0x16 ./src/ses_lcdDriver.o
+                0x00000344                lcdDriver_writeData
  .text.lcdDriver_writeCommand
-                0x00000366       0x16 ./src/ses_lcdDriver.o
-                0x00000366                lcdDriver_writeCommand
+                0x0000035a       0x16 ./src/ses_lcdDriver.o
+                0x0000035a                lcdDriver_writeCommand
  .text.lcdDriver_selectController
-                0x0000037c        0xc ./src/ses_lcdDriver.o
-                0x0000037c                lcdDriver_selectController
+                0x00000370        0xc ./src/ses_lcdDriver.o
+                0x00000370                lcdDriver_selectController
  .text.lcdDriver_readStatus
-                0x00000388       0x14 ./src/ses_lcdDriver.o
-                0x00000388                lcdDriver_readStatus
+                0x0000037c       0x14 ./src/ses_lcdDriver.o
+                0x0000037c                lcdDriver_readStatus
  .text.led_redInit
-                0x0000039c        0x4 ./src/ses_led.o
-                0x0000039c                led_redInit
+                0x00000390        0x4 ./src/ses_led.o
+                0x00000390                led_redInit
  .text.led_redToggle
-                0x000003a0        0xa ./src/ses_led.o
-                0x000003a0                led_redToggle
+                0x00000394        0xa ./src/ses_led.o
+                0x00000394                led_redToggle
  .text.led_redOn
-                0x000003aa        0x4 ./src/ses_led.o
-                0x000003aa                led_redOn
+                0x0000039e        0x4 ./src/ses_led.o
+                0x0000039e                led_redOn
  .text.led_redOff
-                0x000003ae        0x4 ./src/ses_led.o
-                0x000003ae                led_redOff
+                0x000003a2        0x4 ./src/ses_led.o
+                0x000003a2                led_redOff
  .text.led_yellowInit
-                0x000003b2        0x4 ./src/ses_led.o
-                0x000003b2                led_yellowInit
+                0x000003a6        0x4 ./src/ses_led.o
+                0x000003a6                led_yellowInit
  .text.led_yellowToggle
-                0x000003b6        0x8 ./src/ses_led.o
-                0x000003b6                led_yellowToggle
+                0x000003aa        0x8 ./src/ses_led.o
+                0x000003aa                led_yellowToggle
  .text.led_yellowOn
-                0x000003be        0x4 ./src/ses_led.o
-                0x000003be                led_yellowOn
+                0x000003b2        0x4 ./src/ses_led.o
+                0x000003b2                led_yellowOn
  .text.led_yellowOff
-                0x000003c2        0x4 ./src/ses_led.o
-                0x000003c2                led_yellowOff
+                0x000003b6        0x4 ./src/ses_led.o
+                0x000003b6                led_yellowOff
  .text.led_greenInit
-                0x000003c6        0x4 ./src/ses_led.o
-                0x000003c6                led_greenInit
+                0x000003ba        0x4 ./src/ses_led.o
+                0x000003ba                led_greenInit
  .text.led_greenToggle
-                0x000003ca        0xa ./src/ses_led.o
-                0x000003ca                led_greenToggle
+                0x000003be        0xa ./src/ses_led.o
+                0x000003be                led_greenToggle
  .text.led_greenOn
-                0x000003d4        0x4 ./src/ses_led.o
-                0x000003d4                led_greenOn
+                0x000003c8        0x4 ./src/ses_led.o
+                0x000003c8                led_greenOn
  .text.led_greenOff
-                0x000003d8        0x4 ./src/ses_led.o
-                0x000003d8                led_greenOff
- .text.libgcc   0x000003dc        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_exit.o)
- .text.libgcc   0x000003dc        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_clear_bss.o)
+                0x000003cc        0x4 ./src/ses_led.o
+                0x000003cc                led_greenOff
+ .text.libgcc   0x000003d0        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_exit.o)
+ .text.libgcc   0x000003d0        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_clear_bss.o)
  .text.avr-libc
-                0x000003dc       0x56 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(fputs.o)
-                0x000003dc                fputs
+                0x000003d0       0x56 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(fputs.o)
+                0x000003d0                fputs
  .text.avr-libc
-                0x00000432       0x24 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(printf.o)
-                0x00000432                printf
+                0x00000426       0x24 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(printf.o)
+                0x00000426                printf
  .text.avr-libc
-                0x00000456      0x40c c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(vfprintf_std.o)
-                0x00000456                vfprintf
+                0x0000044a      0x40c c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(vfprintf_std.o)
+                0x0000044a                vfprintf
  .text.avr-libc
-                0x00000862       0x16 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(strnlen_P.o)
-                0x00000862                strnlen_P
+                0x00000856       0x16 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(strnlen_P.o)
+                0x00000856                strnlen_P
  .text.avr-libc
-                0x00000878       0x16 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(strnlen.o)
-                0x00000878                strnlen
+                0x0000086c       0x16 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(strnlen.o)
+                0x0000086c                strnlen
  .text.avr-libc
-                0x0000088e       0x58 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(fputc.o)
-                0x0000088e                fputc
+                0x00000882       0x58 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(fputc.o)
+                0x00000882                fputc
  .text.avr-libc
-                0x000008e6       0xbc c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(ultoa_invert.o)
-                0x000008e6                __ultoa_invert
-                0x000009a2                . = ALIGN (0x2)
+                0x000008da       0xbc c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(ultoa_invert.o)
+                0x000008da                __ultoa_invert
+                0x00000996                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x000009a2        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_exit.o)
-                0x000009a2                exit
-                0x000009a2                _exit
+ .fini9         0x00000996        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_exit.o)
+                0x00000996                exit
+                0x00000996                _exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -388,11 +388,11 @@ LOAD c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x000009a2        0x4 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_exit.o)
+ .fini0         0x00000996        0x4 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_exit.o)
  *(.fini0)
-                0x000009a6                _etext = .
+                0x0000099a                _etext = .
 
-.data           0x00800200      0x62e load address 0x000009a6
+.data           0x00800200      0x62e load address 0x0000099a
                 0x00800200                PROVIDE (__data_start, .)
  *(.data)
  .data          0x00800200        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51/crtm128rfa1.o
@@ -443,8 +443,8 @@ LOAD c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a
  COMMON         0x0080083e        0x6 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(iob.o)
                 0x0080083e                __iob
                 0x00800844                PROVIDE (__bss_end, .)
-                0x000009a6                __data_load_start = LOADADDR (.data)
-                0x00000fd4                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x0000099a                __data_load_start = LOADADDR (.data)
+                0x00000fc8                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00800844        0x0
                 0x00800844                PROVIDE (__noinit_start, .)
