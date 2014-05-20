@@ -11,14 +11,13 @@
 
 void lcdDriver_init() 
 {
-//	DDRD |= ((1 << DISPLAY_CS_PIN) | (1 << DISPLAY_WR_PIN) | (1 << DISPLAY_RD_PIN) | (1 << DISPLAY_A0_PIN) );
 	DDR(DISPLAY_CS_PORT) |= (1 << DISPLAY_CS_PIN);
 	DDR(DISPLAY_WR_PORT) |= (1 << DISPLAY_WR_PIN);
 	DDR(DISPLAY_RD_PORT) |= (1 << DISPLAY_RD_PIN);
 	DDR(DISPLAY_A0_PORT) |= (1 << DISPLAY_A0_PIN);
 	DISPLAY_WR_PORT |= (1 << DISPLAY_WR_PIN);
 	DISPLAY_RD_PORT |= (1 << DISPLAY_RD_PIN);
-	
+	DISPLAY_A0_PORT &= ~(1 << DISPLAY_A0_PIN);
 }
 
 /****************************************************
@@ -37,7 +36,6 @@ void lcdDriver_writeData(uint8_t data)
 {
 	DDR(DISPLAY_DATA_PORT) = 0xFF;
 	DISPLAY_A0_PORT |= (1 << DISPLAY_A0_PIN);
-	DISPLAY_WR_PORT |= (1 << DISPLAY_WR_PIN);
 	
 	// write
 	DISPLAY_WR_PORT &= ~(1 << DISPLAY_WR_PIN);
@@ -45,11 +43,10 @@ void lcdDriver_writeData(uint8_t data)
 	
 	
 	// wait 160 ns
-	_delay_us(1);
-//	asm("NOP");
-//	asm("NOP");
-//	asm("NOP");
-//
+	asm("NOP");
+	asm("NOP");
+	asm("NOP");
+
 
 	// finalize operation
 	DISPLAY_WR_PORT |= (1 << DISPLAY_WR_PIN);
@@ -61,20 +58,15 @@ void lcdDriver_writeCommand(uint8_t data)
 {
 	DDR(DISPLAY_DATA_PORT) = 0xFF;
 	DISPLAY_A0_PORT &= ~(1 << DISPLAY_A0_PIN);
-	DISPLAY_WR_PORT |= (1 << DISPLAY_WR_PIN);
 	
 	// write
 	DISPLAY_WR_PORT &= ~(1 << DISPLAY_WR_PIN);
 	DISPLAY_DATA_PORT = data;
 	
-	
 	// wait 160 ns
-	_delay_us(1);
-//	asm("NOP");
-//	asm("NOP");
-//	asm("NOP");
-		
-
+	asm("NOP");
+	asm("NOP");
+	asm("NOP");
 	
 	// finalize operation
 	DISPLAY_WR_PORT |= (1 << DISPLAY_WR_PIN);
@@ -108,24 +100,25 @@ void lcdDriver_selectController(uint8_t sel)
 /************************************************************************/
 uint8_t lcdDriver_readStatus()
 {
-	uint8_t DATA;
+	uint8_t data;
 
 	DDR(DISPLAY_DATA_PORT) = 0x00;
+	DISPLAY_DATA_PORT = 0x00;
 	DISPLAY_A0_PORT &= ~(1 << DISPLAY_A0_PIN);
-	DISPLAY_RD_PORT |= (1 << DISPLAY_RD_PIN);
 
 	// read
 	DISPLAY_RD_PORT &= ~(1 << DISPLAY_RD_PIN);
-	DATA = DISPLAY_DATA_PORT;
 	
 	// wait 180 ns
-	_delay_us(1);
-//	asm("nop");
-//	asm("nop");
-//	asm("nop");
+	asm("nop");
+	asm("nop");
+	asm("nop");
 	
+	// read
+	data = DISPLAY_DATA_PORT;
+
 	// finalize operation
 	DISPLAY_RD_PORT |=  (1 << DISPLAY_RD_PIN);
 
-	return DATA;
+	return data;
 }

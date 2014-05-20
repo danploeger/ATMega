@@ -45,6 +45,7 @@ Address of section .data set to 0x800200
 LOAD c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51/crtm128rfa1.o
 LOAD ./src/lcdtest.o
 LOAD ./src/ses_lcdDriver.o
+LOAD ./src/ses_led.o
 LOAD C:/Users/dploeger/Documents/Uni/Software for Embedded Systems/ATMega/sheet4/src/libses_lcd.a
 LOAD c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a
 LOAD c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a
@@ -140,7 +141,7 @@ LOAD c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x95c
+.text           0x00000000      0x9a6
  *(.vectors)
  .vectors       0x00000000      0x120 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51/crtm128rfa1.o
                 0x00000000                __vectors
@@ -270,6 +271,7 @@ LOAD c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a
                 0x0000015e                __vector_65
  .text          0x00000162        0x0 ./src/lcdtest.o
  .text          0x00000162        0x0 ./src/ses_lcdDriver.o
+ .text          0x00000162        0x0 ./src/ses_led.o
  .text          0x00000162      0x178 C:/Users/dploeger/Documents/Uni/Software for Embedded Systems/ATMega/sheet4/src/libses_lcd.a(ses_lcd.o)
                 0x000001c2                lcd_setCursor
                 0x000001cc                lcd_putc
@@ -287,51 +289,87 @@ LOAD c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a
  .text          0x000002da        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(ultoa_invert.o)
                 0x000002da                . = ALIGN (0x2)
  *(.text.*)
- .text.main     0x000002da       0x5a ./src/lcdtest.o
+ .text.main     0x000002da       0x66 ./src/lcdtest.o
                 0x000002da                main
  .text.lcdDriver_init
-                0x00000334        0xe ./src/ses_lcdDriver.o
-                0x00000334                lcdDriver_init
+                0x00000340       0x10 ./src/ses_lcdDriver.o
+                0x00000340                lcdDriver_init
  .text.lcdDriver_writeData
-                0x00000342       0x18 ./src/ses_lcdDriver.o
-                0x00000342                lcdDriver_writeData
+                0x00000350       0x16 ./src/ses_lcdDriver.o
+                0x00000350                lcdDriver_writeData
  .text.lcdDriver_writeCommand
-                0x0000035a       0x18 ./src/ses_lcdDriver.o
-                0x0000035a                lcdDriver_writeCommand
+                0x00000366       0x16 ./src/ses_lcdDriver.o
+                0x00000366                lcdDriver_writeCommand
  .text.lcdDriver_selectController
-                0x00000372        0xc ./src/ses_lcdDriver.o
-                0x00000372                lcdDriver_selectController
+                0x0000037c        0xc ./src/ses_lcdDriver.o
+                0x0000037c                lcdDriver_selectController
  .text.lcdDriver_readStatus
-                0x0000037e       0x14 ./src/ses_lcdDriver.o
-                0x0000037e                lcdDriver_readStatus
- .text.libgcc   0x00000392        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_exit.o)
- .text.libgcc   0x00000392        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_clear_bss.o)
+                0x00000388       0x14 ./src/ses_lcdDriver.o
+                0x00000388                lcdDriver_readStatus
+ .text.led_redInit
+                0x0000039c        0x4 ./src/ses_led.o
+                0x0000039c                led_redInit
+ .text.led_redToggle
+                0x000003a0        0xa ./src/ses_led.o
+                0x000003a0                led_redToggle
+ .text.led_redOn
+                0x000003aa        0x4 ./src/ses_led.o
+                0x000003aa                led_redOn
+ .text.led_redOff
+                0x000003ae        0x4 ./src/ses_led.o
+                0x000003ae                led_redOff
+ .text.led_yellowInit
+                0x000003b2        0x4 ./src/ses_led.o
+                0x000003b2                led_yellowInit
+ .text.led_yellowToggle
+                0x000003b6        0x8 ./src/ses_led.o
+                0x000003b6                led_yellowToggle
+ .text.led_yellowOn
+                0x000003be        0x4 ./src/ses_led.o
+                0x000003be                led_yellowOn
+ .text.led_yellowOff
+                0x000003c2        0x4 ./src/ses_led.o
+                0x000003c2                led_yellowOff
+ .text.led_greenInit
+                0x000003c6        0x4 ./src/ses_led.o
+                0x000003c6                led_greenInit
+ .text.led_greenToggle
+                0x000003ca        0xa ./src/ses_led.o
+                0x000003ca                led_greenToggle
+ .text.led_greenOn
+                0x000003d4        0x4 ./src/ses_led.o
+                0x000003d4                led_greenOn
+ .text.led_greenOff
+                0x000003d8        0x4 ./src/ses_led.o
+                0x000003d8                led_greenOff
+ .text.libgcc   0x000003dc        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_exit.o)
+ .text.libgcc   0x000003dc        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_clear_bss.o)
  .text.avr-libc
-                0x00000392       0x56 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(fputs.o)
-                0x00000392                fputs
+                0x000003dc       0x56 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(fputs.o)
+                0x000003dc                fputs
  .text.avr-libc
-                0x000003e8       0x24 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(printf.o)
-                0x000003e8                printf
+                0x00000432       0x24 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(printf.o)
+                0x00000432                printf
  .text.avr-libc
-                0x0000040c      0x40c c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(vfprintf_std.o)
-                0x0000040c                vfprintf
+                0x00000456      0x40c c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(vfprintf_std.o)
+                0x00000456                vfprintf
  .text.avr-libc
-                0x00000818       0x16 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(strnlen_P.o)
-                0x00000818                strnlen_P
+                0x00000862       0x16 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(strnlen_P.o)
+                0x00000862                strnlen_P
  .text.avr-libc
-                0x0000082e       0x16 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(strnlen.o)
-                0x0000082e                strnlen
+                0x00000878       0x16 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(strnlen.o)
+                0x00000878                strnlen
  .text.avr-libc
-                0x00000844       0x58 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(fputc.o)
-                0x00000844                fputc
+                0x0000088e       0x58 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(fputc.o)
+                0x0000088e                fputc
  .text.avr-libc
-                0x0000089c       0xbc c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(ultoa_invert.o)
-                0x0000089c                __ultoa_invert
-                0x00000958                . = ALIGN (0x2)
+                0x000008e6       0xbc c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(ultoa_invert.o)
+                0x000008e6                __ultoa_invert
+                0x000009a2                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00000958        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_exit.o)
-                0x00000958                exit
-                0x00000958                _exit
+ .fini9         0x000009a2        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_exit.o)
+                0x000009a2                exit
+                0x000009a2                _exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -350,16 +388,17 @@ LOAD c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00000958        0x4 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_exit.o)
+ .fini0         0x000009a2        0x4 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_exit.o)
  *(.fini0)
-                0x0000095c                _etext = .
+                0x000009a6                _etext = .
 
-.data           0x00800200      0x62e load address 0x0000095c
+.data           0x00800200      0x62e load address 0x000009a6
                 0x00800200                PROVIDE (__data_start, .)
  *(.data)
  .data          0x00800200        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51/crtm128rfa1.o
  .data          0x00800200       0x2c ./src/lcdtest.o
  .data          0x0080022c        0x0 ./src/ses_lcdDriver.o
+ .data          0x0080022c        0x0 ./src/ses_led.o
  .data          0x0080022c      0x602 C:/Users/dploeger/Documents/Uni/Software for Embedded Systems/ATMega/sheet4/src/libses_lcd.a(ses_lcd.o)
                 0x0080022c                font6x8
                 0x0080082c                lcdout
@@ -387,6 +426,7 @@ LOAD c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a
  .bss           0x0080082e        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51/crtm128rfa1.o
  .bss           0x0080082e        0x0 ./src/lcdtest.o
  .bss           0x0080082e        0x0 ./src/ses_lcdDriver.o
+ .bss           0x0080082e        0x0 ./src/ses_led.o
  .bss           0x0080082e       0x10 C:/Users/dploeger/Documents/Uni/Software for Embedded Systems/ATMega/sheet4/src/libses_lcd.a(ses_lcd.o)
  .bss           0x0080083e        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_exit.o)
  .bss           0x0080083e        0x0 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a(_clear_bss.o)
@@ -403,8 +443,8 @@ LOAD c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/avr51\libgcc.a
  COMMON         0x0080083e        0x6 c:/apps/winavr-20100110/bin/../lib/gcc/avr/4.3.3/../../../../avr/lib/avr51\libc.a(iob.o)
                 0x0080083e                __iob
                 0x00800844                PROVIDE (__bss_end, .)
-                0x0000095c                __data_load_start = LOADADDR (.data)
-                0x00000f8a                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x000009a6                __data_load_start = LOADADDR (.data)
+                0x00000fd4                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00800844        0x0
                 0x00800844                PROVIDE (__noinit_start, .)
