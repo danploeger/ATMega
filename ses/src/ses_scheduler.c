@@ -5,12 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* TYPES *********************************************************************/
-typedef struct {
-	task_t task;
-	uint16_t expire;
-	uint16_t period;
-} taskDescriptor_t;
+
 
 /* PRIVATE VARIABLES *********************************************************/
 volatile taskDescriptor_t tasks[SCHEDULER_ENTRIES];
@@ -24,6 +19,7 @@ volatile taskDescriptor_t tasks[SCHEDULER_ENTRIES];
  * scheduler also accesses this variable
  */
 void scheduler_update(void) {
+
 	for(int i=0; i < SCHEDULER_ENTRIES; i++) {
 			ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 				if(tasks[i].task != NULL && tasks[i].expire > 0) {
@@ -39,10 +35,7 @@ void scheduler_init() {
 		tasks[i].task = NULL;
 	}
 
-
 	timer2_init(scheduler_update);
-
-
 
 }
 
@@ -87,11 +80,12 @@ bool scheduler_add(task_t task, uint16_t expire, uint16_t period) {
 
 	// search a free slot
 	for(int i=0; i < SCHEDULER_ENTRIES; i++) {
-
-		if (tasks[i].task == NULL) {
-			// found a free slot
-			tasks[i] = aTask;
-			return false;
+		ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+			if (tasks[i].task == NULL) {
+				// found a free slot
+				tasks[i] = aTask;
+				return false;
+			}
 		}
 	}
 
@@ -107,9 +101,26 @@ bool scheduler_add(task_t task, uint16_t expire, uint16_t period) {
  * If task is found it is set to NULL
  */
 void scheduler_remove(task_t task) {
+
 	for(int i=0; i < SCHEDULER_ENTRIES; i++) {
-		if(task==tasks[i].task) {
-			tasks[i].task = NULL;
+		ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+			if(task==tasks[i].task) {
+				tasks[i].task = NULL;
+			}
 		}
 	}
+}
+
+/**
+ * Returns a pointer to a task descriptor or NULL if task is not within schedulers tasks
+ */
+taskDescriptor_t* scheduler_find(task_t task) {
+	for(int i=0; i < SCHEDULER_ENTRIES; i++) {
+		ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+			if(task==tasks[i].task) {
+				return &tasks[i];
+			}
+		}
+	}
+	return NULL;
 }

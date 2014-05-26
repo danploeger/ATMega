@@ -1,7 +1,8 @@
 /* INCLUDES ******************************************************************/
 
-#include "ses_button.h"
+
 #include "ses_led.h"
+#include "ses_button.h"
 
 /* PRIVATE VARIABLES *********************************************************/
 
