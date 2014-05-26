@@ -47,13 +47,13 @@ sizedummy \
 all: task_5_3.elf secondary-outputs
 
 dependents:
-	-cd /home/happy/workspace/ses/Release && $(MAKE) clean all
+	-cd C:/Users/dploeger/Documents/Uni/Software\ for\ Embedded\ Systems/ATMega/ses/Debug && $(MAKE) clean all
 
 # Tool invocations
-task_5_3.elf: $(OBJS) $(USER_OBJS) /home/happy/workspace/ses/Release/libses.a
+task_5_3.elf: $(OBJS) $(USER_OBJS) C:/Users/dploeger/Documents/Uni/Software\ for\ Embedded\ Systems/ATMega/ses/Debug/libses.a
 	@echo 'Building target: $@'
 	@echo 'Invoking: AVR C Linker'
-	avr-gcc -Wl,-Map,task_5_3.map -L"/home/happy/workspace/ses/Release" -mmcu=atmega128rfa1 -o "task_5_3.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	avr-gcc -Wl,-Map,task_5_3.map -L"C:\Users\dploeger\Documents\Uni\Software for Embedded Systems\ATMega\ses\Release" -mmcu=atmega128rfa1 -o "task_5_3.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -90,6 +90,6 @@ secondary-outputs: $(LSS) $(FLASH_IMAGE) $(EEPROM_IMAGE) $(SIZEDUMMY)
 
 .PHONY: all clean dependents
 .SECONDARY:
-/home/happy/workspace/ses/Release/libses.a:
+C:/Users/dploeger/Documents/Uni/Software\ for\ Embedded\ Systems/ATMega/ses/Debug/libses.a:
 
 -include ../makefile.targets
