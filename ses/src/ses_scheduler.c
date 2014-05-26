@@ -26,7 +26,7 @@ volatile taskDescriptor_t tasks[SCHEDULER_ENTRIES];
 void scheduler_update(void) {
 	for(int i=0; i < SCHEDULER_ENTRIES; i++) {
 			ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-				if(tasks[i].task != NULL) {
+				if(tasks[i].task != NULL && tasks[i].expire > 0) {
 					tasks[i].expire--;
 				}
 			}
@@ -35,7 +35,14 @@ void scheduler_update(void) {
 
 void scheduler_init() {
 
+	for(int i=0; i < SCHEDULER_ENTRIES; i++) {
+		tasks[i].task = NULL;
+	}
+
+
 	timer2_init(scheduler_update);
+
+
 
 }
 
@@ -50,7 +57,7 @@ void scheduler_run() {
 				if(0 == taskDescr.expire) {
 					taskDescr.task();
 
-					if(0 >= taskDescr.period) {
+					if(0 == taskDescr.period) {
 						tasks[i].task = NULL;
 					}
 					else {
