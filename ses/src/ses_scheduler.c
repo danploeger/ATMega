@@ -55,8 +55,8 @@ void scheduler_run() {
 
 					if(0 == taskDescr.period) {
 						tasks[i].task = NULL;
-						lcd_setCursor(i, 1);
-						printf("%d", i);
+						lcd_setCursor(i, 0);
+						printf("_");
 					}
 					else {
 						tasks[i].expire = tasks[i].period;
@@ -116,6 +116,8 @@ void scheduler_remove(task_t task) {
 		ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 			if(task==tasks[i].task) {
 				tasks[i].task = NULL;
+				lcd_setCursor(i, 0);
+				printf("_");
 			}
 		}
 	}

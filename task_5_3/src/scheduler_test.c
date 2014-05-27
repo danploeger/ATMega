@@ -10,73 +10,35 @@
 
 volatile uint16_t stopWatchTimerInMs = 20000;
 
-volatile bool joystickTaskScheduled = false;
-volatile bool rotaryTaskScheduled = false;
 /* FUNCTION DEFINITION *******************************************************/
 
 
 void stopWatch(void) {
 	if(stopWatchTimerInMs > 0) {
-		lcd_setCursor(3, 0);
+		lcd_setCursor(0, 3);
 		printf("%d\n", stopWatchTimerInMs);
 		stopWatchTimerInMs--;
-
-	}
-}
-
-
-/**
- * Checks if the joystick button is still pressed. After 1 ms the bouncing must have stopped and
- * we should be able to read a active high signal from the pin
- */
-void checkJoystickButton() {
-	if ( PORTB & (1 << BUTTON_JOYSTICK_PIN) ) {
-		led_yellowToggle();
-		joystickTaskScheduled = false;
-	}
-
-}
-
-void checkRotaryButton() {
-	if (PORTB & (1 << BUTTON_ROTARY_PIN)) {
-		// start watch
-		scheduler_add( stopWatch, stopWatchTimerInMs, 0);
-	}
-	else {
+	} else {
+		printf("%d\n", stopWatchTimerInMs);
 		// stop watch
-		scheduler_remove( stopWatch );
+		scheduler_remove(stopWatch);
 	}
 }
-
 
 void joystickCallback() {
-
-	lcd_setCursor(0,3);
-	printf("joystick");
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		if(joystickTaskScheduled) {
-			return;
-		}
-		joystickTaskScheduled = true;
-	}
-
-
-	if( scheduler_add(checkJoystickButton, 1, 0) ) {
-		led_redOn();
-		exit(1); // no free slots
-	}
-
+	led_yellowToggle();
 }
 
 void rotaryCallback() {
-
-	lcd_setCursor(10 ,3);
-	printf("rotary");
-	if( scheduler_add(checkRotaryButton, 1, 0) ) {
-		led_redOn(); // error
-		exit(1); // no free slots
+	if ((PIN(BUTTON_ROTARY_PORT) & (1 << BUTTON_ROTARY_PIN)) == 0) {
+		if (scheduler_find(stopWatch()) == NULL) {
+			// start watch
+			scheduler_add(stopWatch, 1, 1);
+		} else {
+			// stop watch
+			scheduler_remove(stopWatch());
+		}
 	}
-
 }
 
 
