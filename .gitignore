@@ -1,3 +1,44 @@
+<<<<<<< HEAD
 ses/Release/makefile
 ses/Release/sources.mk
 task_5_3/Release/sources.mk
+=======
+# Folders
+Debug/
+Release/
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Libraries
+*.lib
+*.a
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+
+# embedded specific
+makefile
+*.mk
+*.eep
+*.elf
+*.hex
+*lss
+*.map
+
+>>>>>>> 5d248ecded4592c737e41ee6dd2fd913609102ac

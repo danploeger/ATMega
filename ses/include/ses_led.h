@@ -19,6 +19,14 @@
 
 /* FUNCTION PROTOTYPES *******************************************************/
 
+/**initializes all leds
+ */
+void leds_init(void);
+
+/**turns off all leds
+ */
+void leds_off(void);
+
 /**initializes red led
  */
 void led_redInit(void);

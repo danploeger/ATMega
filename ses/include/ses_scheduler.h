@@ -10,10 +10,19 @@
 
 
 /* TYPES ********************************************************************/
-
 /**type of function pointer for tasks
  */
 typedef void (*task_t)(void);
+
+
+typedef struct {
+	task_t task;
+	uint16_t expire;
+	uint16_t period;
+} taskDescriptor_t;
+
+
+
 
 
 /* FUNCTION PROTOTYPES *******************************************************/
@@ -45,5 +54,10 @@ bool scheduler_add(task_t task, uint16_t expire, uint16_t period);
  * @param task	pointer to timer
  * */
 void scheduler_remove(task_t task);
+
+/**
+ * Returns a task descriptor or NULL if task is not within scheduler tasks
+ */
+taskDescriptor_t* scheduler_find(task_t task);
 
 #endif /* SCHEDULER_H_ */
