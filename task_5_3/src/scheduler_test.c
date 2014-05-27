@@ -5,16 +5,19 @@
 #include "ses_lcdDriver.h"
 #include "ses_button.h"
 #include <stdlib.h>
+#include <util/atomic.h>
 
 
-uint16_t stopWatchTimerInMs = 20000;
+volatile uint16_t stopWatchTimerInMs = 20000;
 
+volatile bool joystickTaskScheduled = false;
+volatile bool rotaryTaskScheduled = false;
 /* FUNCTION DEFINITION *******************************************************/
 
 
 void stopWatch(void) {
 	if(stopWatchTimerInMs > 0) {
-		lcd_setCursor(0, 0);
+		lcd_setCursor(3, 0);
 		printf("%d\n", stopWatchTimerInMs);
 		stopWatchTimerInMs--;
 
@@ -29,6 +32,7 @@ void stopWatch(void) {
 void checkJoystickButton() {
 	if ( PORTB & (1 << BUTTON_JOYSTICK_PIN) ) {
 		led_yellowToggle();
+		joystickTaskScheduled = false;
 	}
 
 }
@@ -46,26 +50,33 @@ void checkRotaryButton() {
 
 
 void joystickCallback() {
-	// add tasks if not already scheduled
-	if( NULL == scheduler_find( checkJoystickButton ))
-	{
-		if( scheduler_add(checkJoystickButton, 1, 0) ) {
-			led_redOn(); // error
-			exit(1); // no free slots
+
+	lcd_setCursor(0,3);
+	printf("joystick");
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		if(joystickTaskScheduled) {
+			return;
 		}
+		joystickTaskScheduled = true;
+	}
+
+
+	if( scheduler_add(checkJoystickButton, 1, 0) ) {
+		led_redOn();
+		exit(1); // no free slots
 	}
 
 }
 
 void rotaryCallback() {
-	// add tasks if not already scheduled
-	if( NULL == scheduler_find( checkRotaryButton ))
-	{
-		if( scheduler_add(checkRotaryButton, 1, 0) ) {
-			led_redOn(); // error
-			exit(1); // no free slots
-		}
+
+	lcd_setCursor(10 ,3);
+	printf("rotary");
+	if( scheduler_add(checkRotaryButton, 1, 0) ) {
+		led_redOn(); // error
+		exit(1); // no free slots
 	}
+
 }
 
 
@@ -77,9 +88,13 @@ int main (void) {
 	lcd_init();
 	stdout=lcdout;
 
+
+	// Start scheduler
+	scheduler_init();
 	button_init();
 	button_setJoystickButtonCallback(joystickCallback);
 	button_setRotaryButtonCallback(rotaryCallback);
+
 
 
 	// IMPORTANT: Globally enable Interrupts
@@ -97,8 +112,6 @@ int main (void) {
 
 
 
-	// Start scheduler
-	scheduler_init();
 
 	// MAIN LOOP
 	while(1) {

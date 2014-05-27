@@ -35,14 +35,17 @@ void button_setJoystickButtonCallback(pButtonCallback callback) {
 // interrupt service routine for pin change interrupt 7:0
 ISR(PCINT0_vect)
 {
-	if (PORTB & (1<<BUTTON_ROTARY_PIN)) {
+
+	if ((PORTB & (1<<BUTTON_ROTARY_PIN)) == 0) {
 		if (rotaryCallback != NULL) {
 			rotaryCallback();
 		}
 	}
-	if (PORTB & (1<<BUTTON_JOYSTICK_PIN)) {
+	if ((PORTB & (1<<BUTTON_JOYSTICK_PIN)) == 0) {
 		if (joystickCallback != NULL) {
 			joystickCallback();
 		}
 	}
+
+
 }

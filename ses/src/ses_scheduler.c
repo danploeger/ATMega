@@ -1,6 +1,8 @@
 /*INCLUDES *******************************************************************/
 #include "ses_timer.h"
 #include "ses_scheduler.h"
+#include "ses_lcd.h"
+#include "ses_lcdDriver.h"
 #include <util/atomic.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,16 +44,19 @@ void scheduler_init() {
 void scheduler_run() {
 
 	for (int i=0; i < SCHEDULER_ENTRIES; i++) {
-		taskDescriptor_t taskDescr = tasks[i];
 
-		if(taskDescr.task != NULL) {
+		ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+			taskDescriptor_t taskDescr = tasks[i];
 
-			ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+			if(taskDescr.task != NULL) {
+
 				if(0 == taskDescr.expire) {
 					taskDescr.task();
 
 					if(0 == taskDescr.period) {
 						tasks[i].task = NULL;
+						lcd_setCursor(i, 1);
+						printf("%d", i);
 					}
 					else {
 						tasks[i].expire = tasks[i].period;
@@ -76,6 +81,8 @@ bool scheduler_add(task_t task, uint16_t expire, uint16_t period) {
 	// create new task
 	taskDescriptor_t aTask = {task, expire, period};
 
+	stdout=lcdout;
+
 
 
 	// search a free slot
@@ -84,6 +91,9 @@ bool scheduler_add(task_t task, uint16_t expire, uint16_t period) {
 			if (tasks[i].task == NULL) {
 				// found a free slot
 				tasks[i] = aTask;
+
+				lcd_setCursor(i, 0);
+				printf("%d", i);
 				return false;
 			}
 		}
