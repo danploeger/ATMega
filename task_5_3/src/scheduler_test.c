@@ -2,6 +2,7 @@
 #include "ses_scheduler.h"
 #include "ses_led.h"
 #include "ses_lcd.h"
+#include "ses_lcdDriver.h"
 #include "ses_button.h"
 #include <stdlib.h>
 
