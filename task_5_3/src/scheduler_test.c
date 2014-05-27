@@ -1,11 +1,25 @@
 
 #include "ses_scheduler.h"
 #include "ses_led.h"
+#include "ses_lcd.h"
 #include "ses_button.h"
 #include <stdlib.h>
 
 
+uint16_t stopWatchTimerInMs = 20000;
+
 /* FUNCTION DEFINITION *******************************************************/
+
+
+void stopWatch(void) {
+	if(stopWatchTimerInMs > 0) {
+		lcd_setCursor(0, 0);
+		printf("%d\n", stopWatchTimerInMs);
+		stopWatchTimerInMs--;
+
+	}
+}
+
 
 /**
  * Checks if the joystick button is still pressed. After 1 ms the bouncing must have stopped and
@@ -20,7 +34,12 @@ void checkJoystickButton() {
 
 void checkRotaryButton() {
 	if (PORTB & (1<<BUTTON_JOYSTICK_PIN)) {
-		led_yellowToggle();
+		// start watch
+		scheduler_add( stopWatch, stopWatchTimerInMs, 0);
+	}
+	else {
+		// stop watch
+		scheduler_remove( stopWatch );
 	}
 }
 
@@ -51,6 +70,9 @@ void rotaryCallback() {
 
 int main (void) {
 	leds_init();
+	lcd_init();
+	stdout=lcdout;
+
 	button_init();
 	button_setJoystickButtonCallback(joystickCallback);
 	button_setRotaryButtonCallback(rotaryCallback);
