@@ -34,7 +34,7 @@ void checkJoystickButton() {
 }
 
 void checkRotaryButton() {
-	if (PORTB & (1<<BUTTON_JOYSTICK_PIN)) {
+	if (PORTB & (1 << BUTTON_ROTARY_PIN)) {
 		// start watch
 		scheduler_add( stopWatch, stopWatchTimerInMs, 0);
 	}
@@ -50,6 +50,7 @@ void joystickCallback() {
 	if( NULL == scheduler_find( checkJoystickButton ))
 	{
 		if( scheduler_add(checkJoystickButton, 1, 0) ) {
+			led_redOn(); // error
 			exit(1); // no free slots
 		}
 	}
@@ -61,6 +62,7 @@ void rotaryCallback() {
 	if( NULL == scheduler_find( checkRotaryButton ))
 	{
 		if( scheduler_add(checkRotaryButton, 1, 0) ) {
+			led_redOn(); // error
 			exit(1); // no free slots
 		}
 	}
@@ -71,6 +73,7 @@ void rotaryCallback() {
 
 int main (void) {
 	leds_init();
+	leds_off();
 	lcd_init();
 	stdout=lcdout;
 
@@ -85,6 +88,7 @@ int main (void) {
 
 	// Add tasks
 	if (scheduler_add(led_greenToggle, 500, 500)) {
+		led_redOn(); // red means error ;-)
 		exit(1); // no free slots
 	}
 

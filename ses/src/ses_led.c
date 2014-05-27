@@ -8,6 +8,7 @@ void leds_init(void) {
 	led_redInit();
 	led_yellowInit();
 	led_greenInit();
+
 }
 
 void leds_off(void) {
