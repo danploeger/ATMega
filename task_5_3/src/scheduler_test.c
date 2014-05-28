@@ -13,12 +13,12 @@ volatile uint16_t stopWatchTimerInMs = 20000;
 
 void startWatch(void) {
 
+	lcd_setCursor(0, 3);
+	printf("%02d.%03d\n", stopWatchTimerInMs/1000, stopWatchTimerInMs%1000);
+
 	if (stopWatchTimerInMs > 0) {
-		lcd_setCursor(0, 3);
-		printf("%02d.%03d\n", stopWatchTimerInMs/1000, stopWatchTimerInMs%1000);
 		stopWatchTimerInMs--;
 	}
-
 }
 
 void joystickCallback() {
