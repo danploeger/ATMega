@@ -2,6 +2,8 @@
 
 
 #include "ses_led.h"
+#include "ses_lcd.h"
+#include "ses_lcdDriver.h"
 #include "ses_button.h"
 #include "ses_scheduler.h"
 #include <util/atomic.h>
@@ -37,8 +39,12 @@ void button_setJoystickButtonCallback(pButtonCallback callback) {
 }
 
 /**
- * Checks if the button is still pressed. After 2 ms the bouncing must have stopped and
- * we should be able to read a active high signal from the pin
+ * This function schedules a task that will check the button state
+ * after 1 ms. After this time the bouncing must have stopped and
+ * we can tell if the button was being pressed for sure.
+ * To avoid that the task is scheduled multiple times a global variable
+ * 'rotaryTaskScheduled' is used. It must be enclosed within an atomic block
+ * so the concurring tasks are not reading/writing this at the same time
  */
 void debounceRotaryButton() {
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {

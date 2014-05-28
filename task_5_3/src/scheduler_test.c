@@ -1,4 +1,3 @@
-
 #include "ses_scheduler.h"
 #include "ses_led.h"
 #include "ses_lcd.h"
@@ -7,22 +6,19 @@
 #include <stdlib.h>
 #include <util/atomic.h>
 
-
-volatile uint16_t stopWatchTimerInMs = 20000;
+bool watchStarted = false;
+volatile uint16_t stopWatchTimerInSec = 20;
 
 /* FUNCTION DEFINITION *******************************************************/
 
+void startWatch(void) {
 
-void stopWatch(void) {
-	if(stopWatchTimerInMs > 0) {
+	if (stopWatchTimerInSec > 0) {
 		lcd_setCursor(0, 3);
-		printf("%d\n", stopWatchTimerInMs);
-		stopWatchTimerInMs--;
-	} else {
-		printf("%d\n", stopWatchTimerInMs);
-		// stop watch
-		scheduler_remove(stopWatch);
+		printf("%d\n", stopWatchTimerInSec);
+		stopWatchTimerInSec--;
 	}
+
 }
 
 void joystickCallback() {
@@ -30,26 +26,23 @@ void joystickCallback() {
 }
 
 void rotaryCallback() {
-	if ((PIN(BUTTON_ROTARY_PORT) & (1 << BUTTON_ROTARY_PIN)) == 0) {
-		if (scheduler_find(stopWatch()) == NULL) {
-			// start watch
-			scheduler_add(stopWatch, 1, 1);
-		} else {
-			// stop watch
-			scheduler_remove(stopWatch());
-		}
+
+	if (!watchStarted) {
+		watchStarted = true;
+		scheduler_add(startWatch, 1000, 1000);
+	} else {
+		watchStarted = false;
+		scheduler_remove(startWatch);
 	}
 }
 
-
 /* TEST FUNCTION *************************************************************/
 
-int main (void) {
+int main(void) {
 	leds_init();
 	leds_off();
 	lcd_init();
-	stdout=lcdout;
-
+	stdout = lcdout;
 
 	// Start scheduler
 	scheduler_init();
@@ -57,11 +50,8 @@ int main (void) {
 	button_setJoystickButtonCallback(joystickCallback);
 	button_setRotaryButtonCallback(rotaryCallback);
 
-
-
 	// IMPORTANT: Globally enable Interrupts
 	sei();
-
 
 	// Add tasks
 	if (scheduler_add(led_greenToggle, 500, 500)) {
@@ -69,17 +59,10 @@ int main (void) {
 		exit(1); // no free slots
 	}
 
-
-
-
-
-
-
 	// MAIN LOOP
-	while(1) {
+	while (1) {
 		scheduler_run();
 	}
-
 
 	return true;
 }
