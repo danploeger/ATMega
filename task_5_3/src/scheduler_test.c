@@ -7,16 +7,16 @@
 #include <util/atomic.h>
 
 bool watchStarted = false;
-volatile uint16_t stopWatchTimerInSec = 20;
+volatile uint16_t stopWatchTimerInMs = 20000;
 
 /* FUNCTION DEFINITION *******************************************************/
 
 void startWatch(void) {
 
-	if (stopWatchTimerInSec > 0) {
+	if (stopWatchTimerInMs > 0) {
 		lcd_setCursor(0, 3);
-		printf("%d\n", stopWatchTimerInSec);
-		stopWatchTimerInSec--;
+		printf("%02d.%03d\n", stopWatchTimerInMs/1000, stopWatchTimerInMs%1000);
+		stopWatchTimerInMs--;
 	}
 
 }
@@ -29,7 +29,7 @@ void rotaryCallback() {
 
 	if (!watchStarted) {
 		watchStarted = true;
-		scheduler_add(startWatch, 1000, 1000);
+		scheduler_add(startWatch, 1, 1);
 	} else {
 		watchStarted = false;
 		scheduler_remove(startWatch);
