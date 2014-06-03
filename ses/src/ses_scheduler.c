@@ -43,26 +43,46 @@ void scheduler_init() {
 
 void scheduler_run() {
 
+
 	for (int i=0; i < SCHEDULER_ENTRIES; i++) {
 
+		task_t taskRunner = NULL;
+
+
+		/* Expire Time is read (and written) here */
 		ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 			taskDescriptor_t taskDescr = tasks[i];
 
 			if(taskDescr.task != NULL) {
 
+				/* Execute expired tasks */
 				if(0 == taskDescr.expire) {
-					taskDescr.task();
 
+					/* Remember Task that is going to be executed */
+					taskRunner = taskDescr.task;
+
+
+					/* Delete non-periodic tasks after execution */
 					if(0 == taskDescr.period) {
 						tasks[i].task = NULL;
-						lcd_setCursor(i, 0);
-						printf("_");
+						#ifdef __DEBUG__
+							lcd_setCursor(i, 0);
+							printf("_");
+						#endif
 					}
+					/* Re-Schedule periodic tasks */
 					else {
 						tasks[i].expire = tasks[i].period;
 					}
 				}
 			}
+		}
+
+
+		/* RUN TASK */
+		if(taskRunner!=NULL) {
+			taskRunner();
+
 		}
 
 
@@ -78,14 +98,11 @@ void scheduler_run() {
  */
 bool scheduler_add(task_t task, uint16_t expire, uint16_t period) {
 
-	// create new task
+	/* create new task */
 	taskDescriptor_t aTask = {task, expire, period};
 
-	stdout=lcdout;
 
-
-
-	// search a free slot
+	/* search a free slot */
 	for(int i=0; i < SCHEDULER_ENTRIES; i++) {
 		ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 			if (tasks[i].task == NULL) {
@@ -116,8 +133,6 @@ void scheduler_remove(task_t task) {
 		ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 			if(task==tasks[i].task) {
 				tasks[i].task = NULL;
-				lcd_setCursor(i, 0);
-				printf("_");
 			}
 		}
 	}
