@@ -12,8 +12,7 @@
 
 pButtonCallback joystickCallback;
 pButtonCallback rotaryCallback;
-volatile bool joystickTaskScheduled = false;
-volatile bool rotaryTaskScheduled = false;
+volatile bool debounceTaskPending = false;
 
 /* FUNCTION DEFINITION *******************************************************/
 
@@ -40,56 +39,42 @@ void button_setJoystickButtonCallback(pButtonCallback callback) {
 
 /**
  * This function schedules a task that will check the button state
- * after 1 ms. After this time the bouncing must have stopped and
+ * after 2 ms. After this time the bouncing must have stopped and
  * we can tell if the button was being pressed for sure.
  * To avoid that the task is scheduled multiple times a global variable
- * 'rotaryTaskScheduled' is used. It must be enclosed within an atomic block
+ * 'debounceTaskPending' is used. It must be enclosed within an atomic block
  * so the concurring tasks are not reading/writing this at the same time
+ * (boolean write is not necessarily atomic)
  */
-void debounceRotaryButton() {
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		if(rotaryTaskScheduled) {
-			return;
-		}
-		rotaryTaskScheduled = true;
-	}
 
-	if(scheduler_add(rotaryCallback, 2, 0)) {
-			led_redOn();
-			exit(1); // no free slots
-	}
-	rotaryTaskScheduled = false;
-}
-
-void debounceJoystickButton() {
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		if(joystickTaskScheduled) {
-			return;
-		}
-		joystickTaskScheduled = true;
-	}
-
-	if(scheduler_add(joystickCallback, 2, 0)) {
-			led_redOn();
-			exit(1); // no free slots
-	}
-	joystickTaskScheduled = false;
-}
-
-
-// interrupt service routine for pin change interrupt 7:0
-ISR(PCINT0_vect)
-{
+void debounceButton() {
 	if ((PIN(BUTTON_ROTARY_PORT) & (1<<BUTTON_ROTARY_PIN)) == 0) {
 		if (rotaryCallback != NULL) {
-			debounceRotaryButton();
+			rotaryCallback();
 		}
 	}
 	if ((PIN(BUTTON_JOYSTICK_PORT) & (1<<BUTTON_JOYSTICK_PIN)) == 0) {
 		if (joystickCallback != NULL) {
-			debounceJoystickButton();
+			joystickCallback();
 		}
 	}
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		debounceTaskPending = false;
+	}
+}
 
+// interrupt service routine for pin change interrupt 7:0
+ISR(PCINT0_vect)
+{
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		if(debounceTaskPending) {
+			return;
+		}
+		debounceTaskPending = true;
+	}
 
+	if(scheduler_add(debounceButton, 2, 0)) {
+			led_redOn();
+			exit(1); // no free slots
+	}
 }
