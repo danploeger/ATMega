@@ -41,5 +41,5 @@ makefile
 *lss
 *.map
 
->>>>>>> 5d248ecded4592c737e41ee6dd2fd913609102ac
+# custom
 *.cproject
