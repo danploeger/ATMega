@@ -14,45 +14,47 @@
 #include "ses_scheduler.h"
 
 
-const unit16_t THRESHOLD 50;
+const uint8_t THRESHOLD = 50;
 
 void checkJoystick(void) {
 
 	uint16_t rawData=0;
 
-	// read data from joystick sensor
+	/* Read data from joystick sensor */
 	rawData = adc_read(ADC_JOYSTICK_CH);
 
+	/* Check data */
 	if( ADC_INVALID_CHANNEL == rawData ) {
 		printf("Invalid Channel");
 		return;
 	}
 
-	// Check the Direction and print to lcd
+	/* Check the Direction and print to lcd */
 	lcd_setCursor(0,0);
-	if( (rawData - 200) < THRESHOLD )		/* RIGHT */
-	{
-		print("RIGHT");
+
+	if( (rawData -200) < THRESHOLD ) {			/* RIGHT */
+		printf("Right");
 	}
-	else if ( rawData - 400) < THRESHOLD)	/* UP */
-	{
-		printf("UP");
+	else if ( (rawData - 400) < THRESHOLD ) {	/* UP */
+		printf("Up");
 	}
-	else if ( rawData - 600) < THRESHOLD) 	/* LEFT */
-	{
-		printf("LEFT");
+	else if ( (rawData - 600) < THRESHOLD ) {	/* LEFT */
+		printf("Left");
 	}
-	else if ( rawData - 800) < THRESHOLD) 	/* DOWN */
-	{
-		printf("DOWN");
+	else if ( (rawData - 800) < THRESHOLD ) {	/* DOWN */
+		printf("Down");
 	}
-	else if( rawData - 1000) < THRESHOLD) 	/* NO DIRECTION */
-	{
-		printf("MIDDLE");
+	else if ( (rawData - 1000) < THRESHOLD ) {	/* MIDDLE */
+		printf("Middle");
 	}
 	else {
-		printf("DIRECTION ERROR");
+		printf("Invalid");
 	}
+
+
+
+
+
 
 }
 

@@ -96,6 +96,8 @@ void adc_disable(void) {
 
 int16_t adc_convertTemp(uint16_t val) {
 
+
+
 }
 
 ISR(ADC_vect)

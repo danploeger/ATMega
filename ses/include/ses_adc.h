@@ -25,8 +25,8 @@
 #define ADC_JOYSTICK_PIN            5
 
 /* reference voltage and prescaling */
-#define ADC_VREF_SRC             0x3; /* use internal 1.6V Voltage Reference */
-#define ADC_PRESCALE             0x6;  /* ADC clock prescaler: 250 kHz with division factor 64 (clock must be 330kHz or less for 10 bit resolution) */
+#define ADC_VREF_SRC             0x3 /* use internal 1.6V Voltage Reference */
+#define ADC_PRESCALE             0x6  /* ADC clock prescaler: 250 kHz with division factor 64 (clock must be 330kHz or less for 10 bit resolution) */
 
 
 /* setup adc channels */
