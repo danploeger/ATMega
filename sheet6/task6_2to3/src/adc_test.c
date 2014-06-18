@@ -52,10 +52,6 @@ void checkJoystick(void) {
 	}
 
 
-
-
-
-
 }
 
 
