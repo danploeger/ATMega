@@ -7,6 +7,7 @@
 
 
 #include <stdlib.h>
+#include "ses_led.h"
 #include "ses_adc.h"
 #include "ses_button.h"
 #include "ses_lcd.h"
@@ -16,51 +17,98 @@
 
 const uint8_t THRESHOLD = 50;
 
-void checkJoystick(void) {
+void joystickCallback (void) {
+	checkSensorChannel(ADC_JOYSTICK_CH);
+}
+
+void tempCallback (void) {
+	checkSensorChannel(ADC_TEMP_CH);
+}
+
+void lightCallback (void) {
+	checkSensorChannel(ADC_LIGHT_CH);
+}
+
+void checkSensorChannel(uint8_t channel) {
 
 	uint16_t rawData=0;
 
-	/* Read data from joystick sensor */
-	rawData = adc_read(ADC_JOYSTICK_CH);
+	/* Read data from sensor */
+	rawData = adc_read(channel);
 
 	/* Check data */
 	if( ADC_INVALID_CHANNEL == rawData ) {
-		printf("Invalid Channel");
+		lcd_setCursor(0,3);
+		printf("Invalid Channel     ");
 		return;
 	}
 
+	switch (channel) {
+	case ADC_MIC_NEG_CH:
+		// unused
+		break;
+	case ADC_MIC_POS_CH:
+		// unused
+		break;
+	case ADC_TEMP_CH:
+		temperatureProcessing(rawData);
+		break;
+	case ADC_LIGHT_CH:
+		lcd_setCursor(0,2);
+		printf("Brightness: %d     ", rawData);
+		break;
+	case ADC_JOYSTICK_CH:
+		joystickProcessing(rawData);
+		break;
+	case ADC_NUM:
+		lcd_setCursor(0,3);
+		printf("#ADC channels: %d     ", rawData);
+		break;
+	default:
+		break;
+	}
+}
+void temperatureProcessing (uint16_t rawData) {
+	lcd_setCursor(0,1);
+	printf("Temperature: %d C     ", rawData); // TODO
+}
+
+void joystickProcessing (uint16_t rawData) {
 	/* Check the Direction and print to lcd */
 	lcd_setCursor(0,0);
 
 	if( (rawData -200) < THRESHOLD ) {			/* RIGHT */
-		printf("Right");
+		printf("Joystick: right     ");
 	}
 	else if ( (rawData - 400) < THRESHOLD ) {	/* UP */
-		printf("Up");
+		printf("Joystick: up     ");
 	}
 	else if ( (rawData - 600) < THRESHOLD ) {	/* LEFT */
-		printf("Left");
+		printf("Joystick: left     ");
 	}
 	else if ( (rawData - 800) < THRESHOLD ) {	/* DOWN */
-		printf("Down");
+		printf("Joystick: down     ");
 	}
 	else if ( (rawData - 1000) < THRESHOLD ) {	/* MIDDLE */
-		printf("Middle");
+		printf("Joystick: middle     ");
 	}
 	else {
-		printf("Invalid");
+		printf("Joystick: invalid     ");
 	}
-
-
 }
 
 
 /* TEST FUNCTION *************************************************************/
 int main(int argc, char **argv) {
 
-	adc_init();
 	lcd_init();
 	stdout = lcdout;
+	adc_init();
+	leds_init();
+
+	led_redOff();
+	led_yellowOff();
+	led_greenOff();
 
 	// Start scheduler
 	scheduler_init();
@@ -70,7 +118,15 @@ int main(int argc, char **argv) {
 	sei();
 
 	// Add tasks
-	if (scheduler_add(checkJoystick, 100, 100)) {
+	if (scheduler_add(joystickCallback, 100, 100)) {
+		led_redOn(); // red means error ;-)
+		exit(1); // no free slots
+	}
+	if (scheduler_add(tempCallback, 300, 1500)) {
+		led_redOn(); // red means error ;-)
+		exit(1); // no free slots
+	}
+	if (scheduler_add(lightCallback, 200, 200)) {
 		led_redOn(); // red means error ;-)
 		exit(1); // no free slots
 	}

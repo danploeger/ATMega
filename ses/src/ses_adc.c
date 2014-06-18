@@ -55,28 +55,28 @@ uint16_t adc_read(uint8_t adc_channel) {
 	ADMUX &= ~((1 << MUX4) | (1 << MUX3) | (1 << MUX2) | (1 << MUX1) | (1 << MUX0));
 	switch (adc_channel) {
 	case ADC_MIC_NEG_CH:
-		ADMUX |= (1 << ADC_MIC_NEG_CH);
+		ADMUX |= ADC_MIC_NEG_CH;
 		break;
 	case ADC_MIC_POS_CH:
-		ADMUX |= (1 << ADC_MIC_POS_CH);
+		ADMUX |= ADC_MIC_POS_CH;
 		break;
 	case ADC_TEMP_CH:
-		ADMUX |= (1 << ADC_TEMP_CH);
+		ADMUX |= ADC_TEMP_CH;
 		break;
 	case ADC_RESERVED1_CH:
-		ADMUX |= (1 << ADC_RESERVED1_CH);
+		ADMUX |= ADC_RESERVED1_CH;
 		break;
 	case ADC_LIGHT_CH:
-		ADMUX |= (1 << ADC_LIGHT_CH);
+		ADMUX |= ADC_LIGHT_CH;
 		break;
 	case ADC_JOYSTICK_CH:
-		ADMUX |= (1 << ADC_JOYSTICK_CH);
+		ADMUX |= ADC_JOYSTICK_CH;
 		break;
 	case ADC_RESERVED2_CH:
-		ADMUX |= (1 << ADC_RESERVED2_CH);
+		ADMUX |= ADC_RESERVED2_CH;
 		break;
 	case ADC_RESERVED3_CH:
-		ADMUX |= (1 << ADC_RESERVED3_CH);
+		ADMUX |= ADC_RESERVED3_CH;
 		break;
 	case ADC_NUM:
 		return ADC_NUM;
