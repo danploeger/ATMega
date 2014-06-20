@@ -51,7 +51,8 @@ void checkSensorChannel(uint8_t channel) {
 		// unused
 		break;
 	case ADC_TEMP_CH:
-		temperatureProcessing(rawData);
+		lcd_setCursor(0,1);
+		printf("Temperature: %d C     ", adc_convertTemp(rawData));
 		break;
 	case ADC_LIGHT_CH:
 		lcd_setCursor(0,2);
@@ -67,10 +68,6 @@ void checkSensorChannel(uint8_t channel) {
 	default:
 		break;
 	}
-}
-void temperatureProcessing (uint16_t rawData) {
-	lcd_setCursor(0,1);
-	printf("Temperature: %d C     ", rawData); // TODO
 }
 
 void joystickProcessing (uint16_t rawData) {
