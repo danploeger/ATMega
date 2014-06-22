@@ -53,7 +53,7 @@ void checkSensorChannel(uint8_t channel) {
 	case ADC_TEMP_CH:
 		/* Print temperature on second row */
 		lcd_setCursor(0,1);
-		printf("Temperature: %d C     ", adc_convertTemp(rawData));
+		printf("Temperature: %d *E-2 C     ", adc_convertTemp(rawData));
 		break;
 	case ADC_LIGHT_CH:
 		/*  Print brightness on third row */

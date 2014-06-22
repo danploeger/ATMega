@@ -26,14 +26,13 @@ def main():
     '''
 
 
-    # range needs integer values. below are the shifted float values by a factor of 1000
+    # range needs integer values. below are the shifted float values by a factor of 100 
     # Calculate 20 values
     r = range(int(Rt_start*FACTOR), int(Rt_end*FACTOR),-int(Step*FACTOR))
 
     print("{"),
     for Rt in r:
 
-        pdb.set_trace()
         T = (B*298.15) / ( B + math.log((Rt/FACTOR)/Rn)*298.15)
         print( "{" + str(int(Rt)) +", "+ str(int(T*FACTOR)) + "}," ), # Genauigkeit von 2 Nachkommastellen
 

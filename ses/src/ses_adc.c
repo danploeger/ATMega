@@ -8,18 +8,32 @@
 
 /* PRIVATE VARIABLES *********************************************************/
 
-/* Temperature
- */
 
-/* TempMap:  First value: resistor, Second value: Temperature in Kelvin */
-const uint16_t RvTempMap[20][2] = { {2711, 27315}, {2597, 27414}, {2483, 27519}, {2369, 27628}, {2255, 27745}, {2141, 27868}, {2027, 28000}, {1913, 28140}, {1799, 28290}, {1685, 28453}, {1571, 28628}, {1457, 28819}, {1343, 29029}, {1229, 29261}, {1115, 29520}, {1001, 29812}, {887, 30146}, {773, 30536}, {659, 31001}, {545, 31573}, {431, 32309} };
+/* Lookup Table
+ * - 20 Values
+ * - reaches from 273.15K..323.15K
+ * - stores a vector: Thermistor value -> Temperatur in Kelvin
+ * - Values are scaled by a factor of 100
+ *
+ * */
+
+#define VALUES 20
+const uint16_t LookupTbl[VALUES][2] = { {2711, 27315}, {2597, 27414}, {2483, 27519}, {2369, 27628}, {2255, 27745}, {2141, 27868}, {2027, 28000}, {1913, 28140}, {1799, 28290}, {1685, 28453}, {1571, 28628}, {1457, 28819}, {1343, 29029}, {1229, 29261}, {1115, 29520}, {1001, 29812}, {887, 30146}, {773, 30536}, {659, 31001}, {545, 31573}, {431, 32309} };
 const uint8_t  SCALE_FACTOR = 100;
+
+/* Step between two Resistor values */
 const uint8_t  STEP_WIDTH = 114;
 
-const uint8_t  VOLTAGE_STEP = 0.0015625; /* Bereichsbreite = Referenzspannung / (Maximalwert + 1)
- 	 	 	 	 	 	 	 	 	 	  *  1.6V / 1024 = 1.5625 mV
- 	 	 	 	 	 	 	 	 	 	  */
+/* Resistor of the voltage divider */
+const uint16_t Rp = 68;
 
+
+/* Resolution of ADC */
+const uint16_t  ADC_RESOLUTION = 1562; /* Bereichsbreite = Referenzspannung / (Maximalwert + 1)
+ 	 	 	 	 	 	 	 	 	 	* 1.6V / 1024    = 1.5625 mV = 1562.500 uV
+ 	 	 	 	 	 	 	 	 	 	*/
+
+const uint32_t ADC_VOLTAGE = 5000000;   /* 5V = 5*10^6 uV
 
 /* FUNCTION DEFINITION *******************************************************/
 
@@ -109,16 +123,51 @@ void adc_disable(void) {
 }
 
 
+
+/*
+ *  Converts the given sensor value and converts it to a temperature using
+ *  a lookup-table
+ *
+ *  val: 	 sensor value
+ *  returns: temperature in celsius ( scaled by SCALE_FACTOR )
+ */
 int16_t adc_convertTemp(uint16_t val) {
 
-	unint8_t voltage = val * VOLSTAGE_STEP;
+	/* Calculate the voltage over the thermistor */
+	long u_adc = val * ADC_RESOLUTION;
+
+	/* Calculate the resistance
+	 *
+	 * Equation  Uadc = 5V * (Rt / (Rt + Rp))   solved to R_t is
+	 *
+	 * 			 R_t = (Rp * Uadc) / (5V - Uadc)
+	 *
+	 * */
+	uint32_t Rt = (Rp * u_adc) / (ADC_VOLTAGE - u_adc) * SCALE_FACTOR;
 
 
 
-	uint8_t index=-1;
-	index = val * SCALE_FACTOR / STEP_WIDTH;
 
-	return RvTempMap[index][1];
+	/* Calculate index of the element in lookup table */
+	uint8_t index = Rt / STEP_WIDTH;
+
+
+	/* Use interpolation to get a more precise result */
+	int16_t temperature=-1;
+
+	if(index < (VALUES-1)) {
+		/* Return mean average */
+		temperature = (LookupTbl[index][1]+LookupTbl[index+1][1]) / 2;
+	}
+	else if (index >= (VALUES-1)) {
+		/* Return highest value */
+		temperature = LookupTbl[VALUES-1][1];
+	}
+	else{
+		/* Conversion failed */
+	}
+
+	return (temperature - 27315);
 }
 
 ISR(ADC_vect)
