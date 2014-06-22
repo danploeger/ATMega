@@ -17,8 +17,8 @@ const uint8_t  STEP_WIDTH = 114;
 /* FUNCTION DEFINITION *******************************************************/
 
 void adc_init(void) {
-	// Step 1: configuration of data direction registers and
-	// deactivation of pull-up resistors
+	/* Step 1: configuration of data direction registers and
+	 * deactivation of pull-up resistors */
 	DDRF  &=~(1 << ADC_TEMP_PIN);
 	DDRF  &=~(1 << ADC_LIGHT_PIN);
 	DDRF  &=~(1 << ADC_MIC_POS_PIN);
@@ -31,67 +31,69 @@ void adc_init(void) {
 	PORTF |= (1 << ADC_MIC_NEG_PIN);
 	PORTF |= (1 << ADC_JOYSTICK_PIN);
 
-	// Step 2: disabling power on ADC
+	/* Step 2: disable power reduction mode on ADC */
 	PRR0 &=  ~(1 << PRADC);
 
-	// Step 3: reference voltage set
+	/* Step 3: reference voltage set */
 	ADMUX |= (ADC_VREF_SRC << REFS0);
 
-	// Step 4: A/D conversion right adjust result
+	/* Step 4: A/D conversion right adjust result */
 	ADMUX &= ~(1 << ADLAR);
 
-	// Step 5: writing of ADC Control and Status Register A
+	/* Step 5: write ADC Control and Status Register A */
 	ADCSRA = ((1 << ADEN) | (0 << ADSC) | (0 << ADATE) | (1 << ADIF) | (1 << ADIE) | (ADC_PRESCALE << ADPS0));
 
-	// Ensure start-up waiting time of 20 us
+	/* Ensure start-up waiting time of 20 us */
 	_delay_us(20);
 }
 
 uint16_t adc_read(uint8_t adc_channel) {
 	set_sleep_mode(SLEEP_MODE_ADC);
 
-	// select adc channel
-	ADCSRB &= ~(1 << MUX5);
-	ADMUX &= ~((1 << MUX4) | (1 << MUX3) | (1 << MUX2) | (1 << MUX1) | (1 << MUX0));
-	switch (adc_channel) {
-	case ADC_MIC_NEG_CH:
-		ADMUX |= ADC_MIC_NEG_CH;
-		break;
-	case ADC_MIC_POS_CH:
-		ADMUX |= ADC_MIC_POS_CH;
-		break;
-	case ADC_TEMP_CH:
-		ADMUX |= ADC_TEMP_CH;
-		break;
-	case ADC_RESERVED1_CH:
-		ADMUX |= ADC_RESERVED1_CH;
-		break;
-	case ADC_LIGHT_CH:
-		ADMUX |= ADC_LIGHT_CH;
-		break;
-	case ADC_JOYSTICK_CH:
-		ADMUX |= ADC_JOYSTICK_CH;
-		break;
-	case ADC_RESERVED2_CH:
-		ADMUX |= ADC_RESERVED2_CH;
-		break;
-	case ADC_RESERVED3_CH:
-		ADMUX |= ADC_RESERVED3_CH;
-		break;
-	case ADC_NUM:
-		return ADC_NUM;
-	default:
-		return ADC_INVALID_CHANNEL;
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		/* select adc channel */
+		ADCSRB &= ~(1 << MUX5);
+		ADMUX &= ~((1 << MUX4) | (1 << MUX3) | (1 << MUX2) | (1 << MUX1) | (1 << MUX0));
+		switch (adc_channel) {
+		case ADC_MIC_NEG_CH:
+			ADMUX |= ADC_MIC_NEG_CH;
+			break;
+		case ADC_MIC_POS_CH:
+			ADMUX |= ADC_MIC_POS_CH;
+			break;
+		case ADC_TEMP_CH:
+			ADMUX |= ADC_TEMP_CH;
+			break;
+		case ADC_RESERVED1_CH:
+			ADMUX |= ADC_RESERVED1_CH;
+			break;
+		case ADC_LIGHT_CH:
+			ADMUX |= ADC_LIGHT_CH;
+			break;
+		case ADC_JOYSTICK_CH:
+			ADMUX |= ADC_JOYSTICK_CH;
+			break;
+		case ADC_RESERVED2_CH:
+			ADMUX |= ADC_RESERVED2_CH;
+			break;
+		case ADC_RESERVED3_CH:
+			ADMUX |= ADC_RESERVED3_CH;
+			break;
+		case ADC_NUM:
+			return ADC_NUM;
+		default:
+			return ADC_INVALID_CHANNEL;
+		}
+
+		/* start conversion */
+		sleep_enable();
+		do {
+			sleep_cpu(); /* go to sleep (and trigger ADC conversion) */
+		} while ((ADCSRA & (1 << ADSC)) != 0); /* validate that the interrupt is triggered by ADC */
+		sleep_disable();
+
+		return ADC;
 	}
-
-	// start conversion
-	sleep_enable();
-	do {
-		sleep_cpu(); // go to sleep (and trigger ADC conversion)
-	} while ((ADCSRA & (1 << ADSC)) != 0); // validate that the interrupt is triggered by ADC
-	sleep_disable();
-
-	return ADC;
 }
 
 
@@ -110,5 +112,8 @@ int16_t adc_convertTemp(uint16_t val) {
 
 ISR(ADC_vect)
 {
-
+	/**
+	 * Interrupt service routine kept empty because further processing
+	 * of converted sensor data already happens in adc_read().
+	 */
 }
