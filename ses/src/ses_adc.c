@@ -16,7 +16,10 @@ const uint16_t RvTempMap[20][2] = { {2711, 27315}, {2597, 27414}, {2483, 27519},
 const uint8_t  SCALE_FACTOR = 100;
 const uint8_t  STEP_WIDTH = 114;
 
-const uint8_t  VOLTAGE_STEP = 0.0015625; /* 0.16V / 1024 */
+const uint8_t  VOLTAGE_STEP = 0.0015625; /* Bereichsbreite = Referenzspannung / (Maximalwert + 1)
+ 	 	 	 	 	 	 	 	 	 	  *  1.6V / 1024 = 1.5625 mV
+ 	 	 	 	 	 	 	 	 	 	  */
+
 
 /* FUNCTION DEFINITION *******************************************************/
 
@@ -108,7 +111,7 @@ void adc_disable(void) {
 
 int16_t adc_convertTemp(uint16_t val) {
 
-	unint8_t voltage = val * 1.6 / 1024;
+	unint8_t voltage = val * VOLSTAGE_STEP;
 
 
 
