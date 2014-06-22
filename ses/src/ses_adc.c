@@ -10,9 +10,13 @@
 
 /* Temperature
  */
+
+/* TempMap:  First value: resistor, Second value: Temperature in Kelvin */
 const uint16_t RvTempMap[20][2] = { {2711, 27315}, {2597, 27414}, {2483, 27519}, {2369, 27628}, {2255, 27745}, {2141, 27868}, {2027, 28000}, {1913, 28140}, {1799, 28290}, {1685, 28453}, {1571, 28628}, {1457, 28819}, {1343, 29029}, {1229, 29261}, {1115, 29520}, {1001, 29812}, {887, 30146}, {773, 30536}, {659, 31001}, {545, 31573}, {431, 32309} };
 const uint8_t  SCALE_FACTOR = 100;
 const uint8_t  STEP_WIDTH = 114;
+
+const uint8_t  VOLTAGE_STEP = 0.0015625; /* 0.16V / 1024 */
 
 /* FUNCTION DEFINITION *******************************************************/
 
@@ -101,6 +105,10 @@ void adc_disable(void) {
 
 
 int16_t adc_convertTemp(uint16_t val) {
+
+	unint8_t voltage = val * 1.6 / 1024;
+
+
 
 	uint8_t index=-1;
 	index = val * SCALE_FACTOR / STEP_WIDTH;
