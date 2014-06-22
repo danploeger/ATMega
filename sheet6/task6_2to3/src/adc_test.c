@@ -36,7 +36,7 @@ void checkSensorChannel(uint8_t channel) {
 	/* Read data from sensor */
 	rawData = adc_read(channel);
 
-	/* Check data */
+	/* Read and output data */
 	if( ADC_INVALID_CHANNEL == rawData ) {
 		lcd_setCursor(0,3);
 		printf("Invalid Channel     ");
@@ -45,15 +45,18 @@ void checkSensorChannel(uint8_t channel) {
 
 	switch (channel) {
 	case ADC_MIC_NEG_CH:
-		// unused
+		/* unused */
 		break;
 	case ADC_MIC_POS_CH:
-		// unused
+		/*  unused */
 		break;
 	case ADC_TEMP_CH:
-		temperatureProcessing(rawData);
+		/* Print temperature on second row */
+		lcd_setCursor(0,1);
+		printf("Temperature: %d C     ", adc_convertTemp(rawData));
 		break;
 	case ADC_LIGHT_CH:
+		/*  Print brightness on third row */
 		lcd_setCursor(0,2);
 		printf("Brightness: %d     ", rawData);
 		break;
@@ -68,13 +71,9 @@ void checkSensorChannel(uint8_t channel) {
 		break;
 	}
 }
-void temperatureProcessing (uint16_t rawData) {
-	lcd_setCursor(0,1);
-	printf("Temperature: %d C     ", rawData); // TODO
-}
 
 void joystickProcessing (uint16_t rawData) {
-	/* Check the Direction and print to lcd */
+	/* Check the Direction of the joystick and print to first lcd row */
 	lcd_setCursor(0,0);
 
 	if( (rawData -200) < THRESHOLD ) {			/* RIGHT */
