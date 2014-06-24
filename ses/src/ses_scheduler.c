@@ -1,8 +1,6 @@
 /*INCLUDES *******************************************************************/
 #include "ses_timer.h"
 #include "ses_scheduler.h"
-#include "ses_lcd.h"
-#include "ses_lcdDriver.h"
 #include <util/atomic.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -109,8 +107,6 @@ bool scheduler_add(task_t task, uint16_t expire, uint16_t period) {
 				// found a free slot
 				tasks[i] = aTask;
 
-				lcd_setCursor(i, 0);
-				printf("%d", i);
 				return false;
 			}
 		}

@@ -17,61 +17,6 @@
 
 const uint8_t THRESHOLD = 50;
 
-void joystickCallback (void) {
-	checkSensorChannel(ADC_JOYSTICK_CH);
-}
-
-void tempCallback (void) {
-	checkSensorChannel(ADC_TEMP_CH);
-}
-
-void lightCallback (void) {
-	checkSensorChannel(ADC_LIGHT_CH);
-}
-
-void checkSensorChannel(uint8_t channel) {
-
-	uint16_t rawData=0;
-
-	/* Read data from sensor */
-	rawData = adc_read(channel);
-
-	/* Read and output data */
-	if( ADC_INVALID_CHANNEL == rawData ) {
-		lcd_setCursor(0,3);
-		printf("Invalid Channel     ");
-		return;
-	}
-
-	switch (channel) {
-	case ADC_MIC_NEG_CH:
-		/* unused */
-		break;
-	case ADC_MIC_POS_CH:
-		/*  unused */
-		break;
-	case ADC_TEMP_CH:
-		/* Print temperature on second row */
-		lcd_setCursor(0,1);
-		printf("Temperature: %d *E-2 C     ", adc_convertTemp(rawData));
-		break;
-	case ADC_LIGHT_CH:
-		/*  Print brightness on third row */
-		lcd_setCursor(0,2);
-		printf("Brightness: %d     ", rawData);
-		break;
-	case ADC_JOYSTICK_CH:
-		joystickProcessing(rawData);
-		break;
-	case ADC_NUM:
-		lcd_setCursor(0,3);
-		printf("#ADC channels: %d     ", rawData);
-		break;
-	default:
-		break;
-	}
-}
-
 void joystickProcessing (uint16_t rawData) {
 	/* Check the Direction of the joystick and print to first lcd row */
 	lcd_setCursor(0,0);
@@ -96,6 +41,61 @@ void joystickProcessing (uint16_t rawData) {
 	}
 }
 
+void checkSensorChannel(uint8_t channel) {
+
+	uint16_t rawData=0;
+
+	/* Read data from sensor */
+	rawData = adc_read(channel);
+
+	/* Read and output data */
+	if( ADC_INVALID_CHANNEL == rawData ) {
+		lcd_setCursor(0,3);
+		printf("Invalid Channel     ");
+		led_redOn();
+		return;
+	}
+
+	switch (channel) {
+	case ADC_MIC_NEG_CH:
+		/* unused */
+		break;
+	case ADC_MIC_POS_CH:
+		/*  unused */
+		break;
+	case ADC_TEMP_CH:
+		/* Print temperature on second row */
+		lcd_setCursor(0,1);
+		printf("Temperature: %d C     ", adc_convertTemp(rawData));
+		break;
+	case ADC_LIGHT_CH:
+		/*  Print brightness on third row */
+		lcd_setCursor(0,2);
+		printf("Brightness: %d     ", rawData);
+		break;
+	case ADC_JOYSTICK_CH:
+		joystickProcessing(rawData);
+		break;
+	case ADC_NUM:
+		lcd_setCursor(0,3);
+		printf("#ADC channels: %d     ", rawData);
+		break;
+	default:
+		break;
+	}
+}
+
+void joystickCallback (void) {
+	checkSensorChannel(ADC_JOYSTICK_CH);
+}
+
+void tempCallback (void) {
+	checkSensorChannel(ADC_TEMP_CH);
+}
+
+void lightCallback (void) {
+	checkSensorChannel(ADC_LIGHT_CH);
+}
 
 /* TEST FUNCTION *************************************************************/
 int main(int argc, char **argv) {

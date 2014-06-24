@@ -33,7 +33,7 @@ const uint16_t  ADC_RESOLUTION = 1562; /* Bereichsbreite = Referenzspannung / (M
  	 	 	 	 	 	 	 	 	 	* 1.6V / 1024    = 1.5625 mV = 1562.500 uV
  	 	 	 	 	 	 	 	 	 	*/
 
-const uint32_t ADC_VOLTAGE = 5000000;   /* 5V = 5*10^6 uV
+const uint32_t ADC_VOLTAGE = 5000000;   /* 5V = 5*10^6 uV */
 
 /* FUNCTION DEFINITION *******************************************************/
 
@@ -106,15 +106,15 @@ uint16_t adc_read(uint8_t adc_channel) {
 			return ADC_INVALID_CHANNEL;
 		}
 
-		/* start conversion */
-		sleep_enable();
-		do {
-			sleep_cpu(); /* go to sleep (and trigger ADC conversion) */
-		} while ((ADCSRA & (1 << ADSC)) != 0); /* validate that the interrupt is triggered by ADC */
-		sleep_disable();
-
-		return ADC;
 	}
+	/* start conversion */
+	sleep_enable();
+	do {
+		sleep_cpu(); /* go to sleep (and trigger ADC conversion) */
+	} while ((ADCSRA & (1 << ADSC)) != 0); /* validate that the interrupt is triggered by ADC */
+	sleep_disable();
+
+	return ADC;
 }
 
 
@@ -166,7 +166,6 @@ int16_t adc_convertTemp(uint16_t val) {
 	else{
 		/* Conversion failed */
 	}
-
 	return (temperature - 27315);
 }
 
