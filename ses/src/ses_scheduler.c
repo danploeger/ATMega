@@ -9,9 +9,55 @@
 
 /* PRIVATE VARIABLES *********************************************************/
 volatile taskDescriptor_t tasks[SCHEDULER_ENTRIES];
+volatile static uint32_t systemTime = 0;
 
 
 /*FUNCTION DEFINITION ********************************************************/
+
+/**
+ * Returns system time in milliseconds
+ */
+uint32_t scheduler_getSystemTime() {
+	uint32_t returnTime = 0;
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		returnTime = systemTime;
+	}
+	return returnTime;
+}
+
+/**
+ * Sets system time in milliseconds
+ */
+void scheduler_setSystemTime(uint32_t newTime) {
+	systemTime = newTime; // TODO: atomic
+}
+
+/**
+ * Returns system time as time of day
+ */
+void scheduler_getTime(struct type_time *time) {
+	uint32_t totalMillis = systemTime;
+	uint32_t totalSeconds = totalMillis / 1000;
+	uint32_t totalMinutes = (totalSeconds / 60);
+	uint16_t totalHours = totalSeconds / 3600;
+
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		time->milli = totalMillis % 1000;
+		time->second = totalSeconds % 60;
+		time->minute = totalMinutes % 60;
+		time->hour = totalHours % 24;
+	}
+}
+
+/**
+ * Sets system time from time of day
+ */
+void scheduler_setTime(const struct type_time *time) {
+	uint8_t totalHours = time->hour;
+	uint16_t totalMinutes = totalHours * 60 + time->minute;
+	uint32_t totalSeconds = totalMinutes * 60 + time->second;
+	systemTime = totalSeconds * 1000 + time->milli;
+}
 
 /**
  * This function decreases the expire time of all tasks
@@ -19,6 +65,10 @@ volatile taskDescriptor_t tasks[SCHEDULER_ENTRIES];
  * scheduler also accesses this variable
  */
 void scheduler_update(void) {
+
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		systemTime++;
+	}
 
 	for(int i=0; i < SCHEDULER_ENTRIES; i++) {
 			ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
@@ -30,6 +80,7 @@ void scheduler_update(void) {
 }
 
 void scheduler_init() {
+	systemTime = 0;
 
 	for(int i=0; i < SCHEDULER_ENTRIES; i++) {
 		tasks[i].task = NULL;
