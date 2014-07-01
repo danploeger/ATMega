@@ -10,7 +10,8 @@
 
 
 /* TYPES ********************************************************************/
-/**type of function pointer for tasks
+
+/** Type of function pointer for tasks.
  */
 typedef void (*task_t)(void);
 
@@ -21,9 +22,15 @@ typedef struct {
 	uint16_t period;
 } taskDescriptor_t;
 
-
-
-
+/**
+ * Readable form of time storage as struct.
+ */
+struct type_time {
+	uint8_t hour;
+	uint8_t minute;
+	uint8_t second;
+	uint16_t milli;
+};
 
 /* FUNCTION PROTOTYPES *******************************************************/
 

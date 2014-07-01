@@ -21,6 +21,17 @@ void startWatch(void) {
 	}
 }
 
+void startClock(void) {
+	uint32_t time = scheduler_getSystemTime();
+	lcd_setCursor(0, 0);
+	printf("%lu", time);
+
+	struct type_time timeStruct;
+	scheduler_getTime(&timeStruct);
+	lcd_setCursor(0, 1);
+	printf("%02d:%02d:%02d:%03d", timeStruct.hour, timeStruct.minute, timeStruct.second, timeStruct.milli);
+}
+
 void joystickCallback() {
 	led_yellowToggle();
 }
@@ -55,6 +66,12 @@ int main(void) {
 
 	// Add tasks
 	if (scheduler_add(led_greenToggle, 500, 500)) {
+		led_redOn(); // red means error ;-)
+		exit(1); // no free slots
+	}
+
+	// Add tasks
+	if (scheduler_add(startClock, 100, 100)) {
 		led_redOn(); // red means error ;-)
 		exit(1); // no free slots
 	}
