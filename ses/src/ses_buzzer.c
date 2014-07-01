@@ -7,7 +7,7 @@
 
 
 #include "ses_buzzer.h"
-#include "ses_commmon.h"
+#include "ses_common.h"
 
 void initBuzzer(void) {
 

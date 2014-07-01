@@ -24,12 +24,12 @@ void startWatch(void) {
 void startClock(void) {
 	uint32_t time = scheduler_getSystemTime();
 	lcd_setCursor(0, 0);
-	printf("%lu", time);
+	printf("Time (ms): %lu", time);
 
 	struct type_time timeStruct;
 	scheduler_getTime(&timeStruct);
 	lcd_setCursor(0, 1);
-	printf("%02d:%02d:%02d:%03d", timeStruct.hour, timeStruct.minute, timeStruct.second, timeStruct.milli);
+	printf("Time: %02d:%02d:%02d:%03d", timeStruct.hour, timeStruct.minute, timeStruct.second, timeStruct.milli);
 }
 
 void joystickCallback() {
