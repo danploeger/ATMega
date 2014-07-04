@@ -25,12 +25,12 @@ typedef struct {
 /**
  * Readable form of time storage as struct.
  */
-struct type_time {
+typedef struct {
 	uint8_t hour;
 	uint8_t minute;
 	uint8_t second;
 	uint16_t milli;
-};
+} time_t;
 
 /* FUNCTION PROTOTYPES *******************************************************/
 
@@ -47,12 +47,12 @@ void scheduler_setSystemTime(uint32_t newTime);
 /**
  * Returns system time as time of day
  */
-void scheduler_getTime(struct type_time *time);
+void scheduler_getTime(time_t *time);
 
 /**
  * Sets system time from time of day
  */
-void scheduler_setTime(const struct type_time *time);
+void scheduler_setTime(const time_t *time);
 
 /**
  * This function decreases the expire time of all tasks

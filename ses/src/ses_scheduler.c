@@ -28,7 +28,7 @@ void scheduler_setSystemTime(uint32_t newTime) {
 	systemTime = newTime; // TODO: atomic
 }
 
-void scheduler_getTime(struct type_time *time) {
+void scheduler_getTime(time_t *time) {
 	uint32_t totalMillis = systemTime;
 	uint32_t totalSeconds = totalMillis / 1000;
 	uint32_t totalMinutes = (totalSeconds / 60);
@@ -42,7 +42,7 @@ void scheduler_getTime(struct type_time *time) {
 	}
 }
 
-void scheduler_setTime(const struct type_time *time) {
+void scheduler_setTime(const time_t *time) {
 	uint8_t totalHours = time->hour;
 	uint16_t totalMinutes = totalHours * 60 + time->minute;
 	uint32_t totalSeconds = totalMinutes * 60 + time->second;
