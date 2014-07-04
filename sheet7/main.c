@@ -74,7 +74,16 @@ void rotaryCallback() {
 
 /* increments time every second */
 void updateSystemTime (void) {
+	Event e;
 	fsm_alarmClock.timeSet += SEC_IN_MS;
+	/* wrap around of time after 24 hours */
+	if (systemTime >= 24 * HOUR_IN_MS) {
+		systemTime = 0;
+	}
+	/* trigger alarm */
+	if (alarmTime >= systemTime) {
+		e.signal = ALARM_SIG;
+	}
 }
 
 /* all sub-initializations of hardware and fsm initial state */
@@ -103,6 +112,7 @@ void alarmClock_init(Fsm *me, Event *e) {
 	e->signal = EVENT_NONE;
 	me->state = (State) alarmClock_setClockHour;
 	me->systemTime = 0;
+	me->alarmTime = 0;
 	me->alarmSet = false;
 }
 
