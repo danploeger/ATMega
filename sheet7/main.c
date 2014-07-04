@@ -74,6 +74,7 @@ void rotaryCallback() {
 }
 
 /* all sub-initializations of hardware and fsm initial state */
+void alarmClock_init(Fsm *me, Event *e) {
 	/** initialize hardware **/
 	/* initialize LEDs */
 	leds_init();
@@ -92,8 +93,11 @@ void rotaryCallback() {
 
 	/* initialize fsm */
 	// TODO set timeStruct
-
+	e->signal = EVENT_NONE;
 	me->state = (State) alarmClock_setClockHour;
+}
+
+
 void alarmClock_setClockHour(Fsm *me, const Event *e) {
 
 	switch (e->signal) {
@@ -131,5 +135,10 @@ void alarmClock_ringAlarm(Fsm *me, const Event *e) {
 
 
 int main(void) {
+	Fsm fsm;
+	fsm_init((Fsm*) &fsm, (void*)alarmClock_init);
+	while (1) {
+		scheduler_run();
+	}
 	return 0;
 }
