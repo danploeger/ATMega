@@ -75,7 +75,6 @@ void rotaryCallback() {
 
 /* increments time every second */
 void updateSystemTime (void) {
-	Event e;
 	fsm_alarmClock.systemTime += SEC_IN_MS;
 	/* increment system time by one second */
 	led_greenToggle();
@@ -85,8 +84,10 @@ void updateSystemTime (void) {
 		fsm_alarmClock.systemTime = 0;
 	}
 	/* trigger alarm */
-	if (fsm_alarmClock.alarmTime >= fsm_alarmClock.systemTime) {
+	if ((fsm_alarmClock.alarmTime >= fsm_alarmClock.systemTime) & fsm_alarmClock.alarmSet) {
+		Event e;
 		e.signal = ALARM_SIG;
+		fsm_dispatch(&fsm_alarmClock, &e);
 	}
 }
 
@@ -201,7 +202,7 @@ void alarmClock_ringAlarm(Fsm *me, const Event *e) {
 		case ROTARY_SIG:
 		case JOYSTICK_SIG:
 			stopAlarm();
-			scheduler_remove(led_redToggle());
+			scheduler_remove(led_redToggle);
 			me->state = alarmClock_clockRun;
 			break;
 		default:
