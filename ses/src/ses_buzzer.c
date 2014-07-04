@@ -8,7 +8,6 @@
 
 #include "ses_buzzer.h"
 #include "ses_common.h"
-#include "ses_led.h"
 
 /**
  *
@@ -19,39 +18,28 @@
  *
  */
 void initBuzzer(void) {
-	leds_init();
-	leds_off();
-
-
 	// Power on Timer 0
 	PRR0 &=  ~(1 << PRTIM0);
-
+	DDR(PORTG)&= ~(1 << PIN5);
 
 	// Configure Timer Mode
 	TCCR0A |= (1 << COM0B0); // Toggle OC0B on Compare Match
 	TCCR0A |= (1 << COM0A0); // Toggle OC0B on Compare Match
 	TCCR0A |= (1 << WGM01);	 // CTC-Mode Clear Timer on Compare Match
 
-	DDR(PORTG)  |= (1 << 5);
-
+	TCCR0B = PRESCALER_440HZ;
 
 	// Set Top Value
-	OCR0A = 71;
-	OCR0B = 71;
-
-	// Set the Prescaler
-	//TCCR0B |= (1 << CS02);
-
-
+	OCR0A = TOP_VALUE_440HZ;
+	OCR0B = TOP_VALUE_440HZ;
 
 }
 
 void startAlarm(void) {
-	TCCR0B |= (1 << CS02 ); // sets prescaler to 64
+	DDR(PORTG)  |= (1 << PIN5);
 }
 
-
 void stopAlarm(void) {
-	TCCR0B &= 248; // set prescaler to 0
+	DDR(PORTG)&= ~(1 << PIN5);
 }
 
