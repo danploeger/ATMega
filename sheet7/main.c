@@ -12,20 +12,30 @@
 #include "ses_lcd.h"
 #include <stdlib.h>
 
-typedef void (State*) (Fsm*, const Event *);
+
+
+typedef struct Fsm Fsm;
+typedef struct Event Event;
+typedef void (*State) (Fsm *, const Event *);
 
 struct Fsm {
 	State state;		// the current state
-	uint8_t state;		// is alarm enabled?
+	uint8_t alarmSet;	// is alarm enabled?
 	uint32_t timeSet;	// temporary buffer for time
 
 };
 
+
+
 struct Event {
-	uint8_t signal		// multi purpose signal
+	uint8_t signal;		// multi purpose signal
 };
 
-/* dispatches events to state machin, called in application */
+
+
+
+
+/* dispatches events to state machine, called in application */
 inline static void fsm_dispatch(Fsm *fsm, const Event* event);
 
 /* sets and calls initial state of state machine */
