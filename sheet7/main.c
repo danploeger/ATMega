@@ -36,10 +36,12 @@ void alarmClock_clockRun(Fsm *, const Event *);
 void alarmClock_setAlarmHour(Fsm *, const Event *);
 void alarmClock_setAlarmMinute(Fsm *, const Event *);
 void alarmClock_ringAlarm(Fsm *, const Event *);
+void displayTime(bool);
+
 
 struct Fsm {
 	State state;			// the current state
-	bool alarmSet;	// is alarm enabled?
+	bool alarmSet;			// is alarm enabled?
 	uint32_t systemTime;	// temporary buffer for time
 	uint32_t alarmTime;		// temporary buffer for alarm
 };
@@ -75,10 +77,11 @@ void rotaryCallback() {
 
 /* increments time every second */
 void updateSystemTime (void) {
-	Event e;
 	fsm_alarmClock.systemTime += SEC_IN_MS;
 	/* increment system time by one second */
 	led_greenToggle();
+
+	displayTime(1);
 
 	/* wrap around of time after 24 hours */
 	if (fsm_alarmClock.systemTime >= 24 * HOUR_IN_MS) {
@@ -86,9 +89,16 @@ void updateSystemTime (void) {
 	}
 	/* trigger alarm */
 	if (fsm_alarmClock.alarmTime >= fsm_alarmClock.systemTime) {
+		Event e;
 		e.signal = ALARM_SIG;
 	}
 }
+
+
+
+
+
+
 
 /* all sub-initializations of hardware and fsm initial state */
 void alarmClock_init(Fsm *me, Event *e) {
@@ -125,6 +135,7 @@ void alarmClock_setClockHour(Fsm *me, const Event *e) {
 	switch (e->signal) {
 		case ROTARY_SIG:
 			me->systemTime += HOUR_IN_MS;
+			displayTime(0);
 			break;
 		case JOYSTICK_SIG:
 			me->state = alarmClock_setClockMinute;
@@ -138,6 +149,7 @@ void alarmClock_setClockMinute(Fsm *me, const Event *e) {
 	switch (e->signal) {
 		case ROTARY_SIG:
 			me->systemTime += MIN_IN_MS;
+			displayTime(0);
 			break;
 		case JOYSTICK_SIG:
 			me->state = alarmClock_clockRun;
@@ -201,13 +213,30 @@ void alarmClock_ringAlarm(Fsm *me, const Event *e) {
 		case ROTARY_SIG:
 		case JOYSTICK_SIG:
 			stopAlarm();
-			scheduler_remove(led_redToggle());
+			scheduler_remove(led_redToggle);
 			me->state = alarmClock_clockRun;
 			break;
 		default:
 			break;
 	}
 }
+
+
+void displayTime(bool showSeconds) {
+	time_t myTime;
+	scheduler_setSystemTime(fsm_alarmClock.systemTime);
+	scheduler_getTime(&myTime);
+	lcd_setCursor(0,1);
+
+	if(showSeconds)
+		printf("%.2d:%.2d:%.2d", myTime.hour, myTime.minute, myTime.second);
+	else
+		printf("%.2d:%.2d", myTime.hour, myTime.minute);
+
+}
+
+
+
 
 int main(void) {
 	/* globally enable Interrupts */
