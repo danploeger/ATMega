@@ -15,7 +15,7 @@
 
 
 #define HOUR_IN_MS 3600000
-#define MIN_IN_MS   600000
+#define MIN_IN_MS    60000
 
 
 /* typedefs */
@@ -99,7 +99,6 @@ void alarmClock_init(Fsm *me, Event *e) {
 
 
 void alarmClock_setClockHour(Fsm *me, const Event *e) {
-
 	switch (e->signal) {
 		case ROTARY_SIG:
 			me->timeSet += HOUR_IN_MS;
@@ -113,12 +112,22 @@ void alarmClock_setClockHour(Fsm *me, const Event *e) {
 }
 
 void alarmClock_setClockMinute(Fsm *me, const Event *e) {
-	Fsm fsm;
-	fsm_init((Fsm*) &fsm, (void*)alarmClock_init);
-	while (1) {
-		scheduler_run();
+	switch (e->signal) {
+		case ROTARY_SIG:
+			me->timeSet += MIN_IN_MS;
+			break;
+		case JOYSTICK_SIG:
+			me->state = alarmClock_clockRun;
+			break;
+		default:
+			break;
 	}
 }
+
+void alarmClock_clockRun(Fsm *me, const Event *e) {
+
+}
+
 void alarmClock_setAlarmHour(Fsm *me, const Event *e) {
 }
 
@@ -129,8 +138,6 @@ void alarmClock_setAlarmMinute(Fsm *me, const Event *e) {
 void alarmClock_ringAlarm(Fsm *me, const Event *e) {
 
 }
-
-
 
 
 
