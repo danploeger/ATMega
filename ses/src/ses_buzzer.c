@@ -40,18 +40,18 @@ void initBuzzer(void) {
 	OCR0B = 71;
 
 	// Set the Prescaler
-	TCCR0B |= (1 << CS02);
+	//TCCR0B |= (1 << CS02);
 
 
 
 }
 
 void startAlarm(void) {
-
+	TCCR0B |= (1 << CS02 ); // sets prescaler to 64
 }
 
 
 void stopAlarm(void) {
-
+	TCCR0B &= 248; // set prescaler to 0
 }
 
