@@ -76,17 +76,16 @@ void rotaryCallback() {
 /* increments time every second */
 void updateSystemTime (void) {
 	Event e;
-
+	fsm_alarmClock.systemTime += SEC_IN_MS;
 	/* increment system time by one second */
-	fsm_alarmClock.timeSet += SEC_IN_MS;
 	led_greenToggle();
 
 	/* wrap around of time after 24 hours */
-	if (systemTime >= 24 * HOUR_IN_MS) {
-		systemTime = 0;
+	if (fsm_alarmClock.systemTime >= 24 * HOUR_IN_MS) {
+		fsm_alarmClock.systemTime = 0;
 	}
 	/* trigger alarm */
-	if (alarmTime >= systemTime) {
+	if (fsm_alarmClock.alarmTime >= fsm_alarmClock.systemTime) {
 		e.signal = ALARM_SIG;
 	}
 }
@@ -113,8 +112,6 @@ void alarmClock_init(Fsm *me, Event *e) {
 	button_init();
 	button_setJoystickButtonCallback(joystickCallback);
 	button_setRotaryButtonCallback(rotaryCallback);
-	/* globally enable Interrupts */
-	sei();
 
 	/* initialize fsm */
 	e->signal = EVENT_NONE;
@@ -199,15 +196,12 @@ void alarmClock_setAlarmMinute(Fsm *me, const Event *e) {
 }
 
 void alarmClock_ringAlarm(Fsm *me, const Event *e) {
-
 	switch (e->signal) {
 		case TIMEOUT_SIG:
-			me->state = alarmClock_clockRun;
-			break;
 		case ROTARY_SIG:
-			me->state = alarmClock_clockRun;
-			break;
 		case JOYSTICK_SIG:
+			stopAlarm();
+			scheduler_remove(led_redToggle());
 			me->state = alarmClock_clockRun;
 			break;
 		default:
@@ -216,6 +210,9 @@ void alarmClock_ringAlarm(Fsm *me, const Event *e) {
 }
 
 int main(void) {
+	/* globally enable Interrupts */
+	sei();
+	/* initialize fsm */
 	fsm_init((Fsm*) &fsm_alarmClock, (void*)alarmClock_init);
 	while (1) {
 		scheduler_run();
