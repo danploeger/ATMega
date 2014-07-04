@@ -77,10 +77,12 @@ void rotaryCallback() {
 
 /* increments time every second */
 void updateSystemTime (void) {
-	fsm_alarmClock.systemTime += SEC_IN_MS;
+	lcd_setCursor(0,0);
+	printf("Current time:");
 	/* increment system time by one second */
-	led_greenToggle();
+	fsm_alarmClock.systemTime += SEC_IN_MS;
 
+	led_greenToggle();
 	displayTime(1);
 
 	/* wrap around of time after 24 hours */
@@ -88,18 +90,12 @@ void updateSystemTime (void) {
 		fsm_alarmClock.systemTime = 0;
 	}
 	/* trigger alarm */
-	if ((fsm_alarmClock.alarmTime >= fsm_alarmClock.systemTime) & fsm_alarmClock.alarmSet) {
+	if ((fsm_alarmClock.alarmTime >= fsm_alarmClock.systemTime) && fsm_alarmClock.alarmSet && (fsm_alarmClock.state == alarmClock_clockRun)) {
 		Event e;
 		e.signal = ALARM_SIG;
 		fsm_dispatch(&fsm_alarmClock, &e);
 	}
 }
-
-
-
-
-
-
 
 /* all sub-initializations of hardware and fsm initial state */
 void alarmClock_init(Fsm *me, Event *e) {
@@ -115,10 +111,6 @@ void alarmClock_init(Fsm *me, Event *e) {
 
 	/* start scheduler */
 	scheduler_init();
-	if (scheduler_add(updateSystemTime, SEC_IN_MS, SEC_IN_MS)) {
-		led_redOn(); // red means error ;-)
-		exit(1); // no free slots
-	}
 	/* initialize buttons */
 	button_init();
 	button_setJoystickButtonCallback(joystickCallback);
@@ -126,19 +118,24 @@ void alarmClock_init(Fsm *me, Event *e) {
 
 	/* initialize fsm */
 	e->signal = EVENT_NONE;
-	me->state = (State) alarmClock_setClockHour;
+	me->state = alarmClock_setClockHour;
 	me->systemTime = 0;
 	me->alarmTime = 0;
 	me->alarmSet = false;
 }
 
 void alarmClock_setClockHour(Fsm *me, const Event *e) {
+	lcd_setCursor(0,0);
+	printf("Set hour with rotary.");
+	lcd_setCursor(0,1);
+	printf("Cont. with joystick.");
 	switch (e->signal) {
 		case ROTARY_SIG:
 			me->systemTime += HOUR_IN_MS;
 			displayTime(0);
 			break;
 		case JOYSTICK_SIG:
+			lcd_clear();
 			me->state = alarmClock_setClockMinute;
 			break;
 		default:
@@ -147,12 +144,21 @@ void alarmClock_setClockHour(Fsm *me, const Event *e) {
 }
 
 void alarmClock_setClockMinute(Fsm *me, const Event *e) {
+	lcd_setCursor(0,0);
+	printf("Set min with rotary.");
+	lcd_setCursor(0,1);
+	printf("Cont. with joystick.");
 	switch (e->signal) {
 		case ROTARY_SIG:
 			me->systemTime += MIN_IN_MS;
 			displayTime(0);
 			break;
 		case JOYSTICK_SIG:
+			if (scheduler_add(updateSystemTime, SEC_IN_MS, SEC_IN_MS)) {
+				led_redOn(); // red means error ;-)
+				exit(1); // no free slots
+			}
+			lcd_clear();
 			me->state = alarmClock_clockRun;
 			break;
 		default:
@@ -174,20 +180,26 @@ void alarmClock_clockRun(Fsm *me, const Event *e) {
 			me->alarmSet ? led_yellowOn() : led_yellowOff();
 			break;
 		case JOYSTICK_SIG:
+			lcd_clear();
 			me->state = alarmClock_setAlarmHour;
 			break;
 		default:
 			break;
 	}
-
 }
 
 void alarmClock_setAlarmHour(Fsm *me, const Event *e) {
+	lcd_setCursor(0,0);
+	printf("Set hour with rotary.");
+	lcd_setCursor(0,1);
+	printf("Cont. with joystick.");
 	switch (e->signal) {
 		case ROTARY_SIG:
 			me->alarmTime += HOUR_IN_MS;
+			displayTime(0);
 			break;
 		case JOYSTICK_SIG:
+			lcd_clear();
 			me->state = alarmClock_setAlarmHour;
 			break;
 		default:
@@ -196,11 +208,17 @@ void alarmClock_setAlarmHour(Fsm *me, const Event *e) {
 }
 
 void alarmClock_setAlarmMinute(Fsm *me, const Event *e) {
+	lcd_setCursor(0,0);
+	printf("Set min with rotary.");
+	lcd_setCursor(0,1);
+	printf("Cont. with joystick.");
 	switch (e->signal) {
 		case ROTARY_SIG:
 			me->alarmTime += MIN_IN_MS;
+			displayTime(0);
 			break;
 		case JOYSTICK_SIG:
+			lcd_clear();
 			me->state = alarmClock_clockRun;
 			break;
 		default:
@@ -222,12 +240,11 @@ void alarmClock_ringAlarm(Fsm *me, const Event *e) {
 	}
 }
 
-
 void displayTime(bool showSeconds) {
 	time_t myTime;
 	scheduler_setSystemTime(fsm_alarmClock.systemTime);
 	scheduler_getTime(&myTime);
-	lcd_setCursor(0,1);
+	lcd_setCursor(0,3);
 
 	if(showSeconds)
 		printf("%.2d:%.2d:%.2d", myTime.hour, myTime.minute, myTime.second);
@@ -235,9 +252,6 @@ void displayTime(bool showSeconds) {
 		printf("%.2d:%.2d", myTime.hour, myTime.minute);
 
 }
-
-
-
 
 int main(void) {
 	/* globally enable Interrupts */
