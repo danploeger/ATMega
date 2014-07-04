@@ -23,6 +23,8 @@ typedef struct Fsm Fsm;
 typedef struct Event Event;
 typedef void (*State) (Fsm *, const Event *);
 
+static Fsm fsm;
+
 
 
 
@@ -63,14 +65,14 @@ inline static void fsm_init(Fsm *fsm, State init) {
 
 void joystickCallback() {
 	Event e;
-	e->signal = JOYSTICK_SIG;
-	fsm_dispatch((Fsm*) & keyboard, (const Event*) &e);
+	e.signal = JOYSTICK_SIG;
+	fsm_dispatch(&fsm, &e);
 }
 
 void rotaryCallback() {
 	Event e;
-	e->signal = ROTARY_SIG;
-	fsm_dispatch((Fsm*) & keyboard, (const Event*) &e);
+	e.signal = ROTARY_SIG;
+	fsm_dispatch(&fsm, &e);
 }
 
 /* all sub-initializations of hardware and fsm initial state */
@@ -130,12 +132,7 @@ void alarmClock_ringAlarm(Fsm *me, const Event *e) {
 
 }
 
-
-
-
-
 int main(void) {
-	Fsm fsm;
 	fsm_init((Fsm*) &fsm, (void*)alarmClock_init);
 	while (1) {
 		scheduler_run();
