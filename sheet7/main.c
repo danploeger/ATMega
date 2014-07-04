@@ -29,7 +29,7 @@ static Fsm fsm;
 
 
 /* signals */
-enum { JOYSTICK_SIG, ROTARY_SIG, TIMEOUT_SIG, EVENT_NONE};
+enum { JOYSTICK_SIG, ROTARY_SIG, ALARM_SIG, TIMEOUT_SIG, EVENT_NONE};
 
 
 /* forward declarations */
@@ -43,9 +43,10 @@ void alarmClock_ringAlarm(Fsm *, const Event *);
 
 
 struct Fsm {
-	State state;		// the current state
-	uint8_t alarmSet;	// is alarm enabled?
-	uint32_t timeSet;	// temporary buffer for time
+	State state;			// the current state
+	uint8_t alarmSet;		// is alarm enabled?
+	uint32_t systemTime;	// temporary buffer for time
+	uint32_t alarmTime;		// temporary buffer for alarm
 };
 
 struct Event {
@@ -103,7 +104,7 @@ void alarmClock_init(Fsm *me, Event *e) {
 void alarmClock_setClockHour(Fsm *me, const Event *e) {
 	switch (e->signal) {
 		case ROTARY_SIG:
-			me->timeSet += HOUR_IN_MS;
+			me->systemTime += HOUR_IN_MS;
 			break;
 		case JOYSTICK_SIG:
 			me->state = alarmClock_setClockMinute;
@@ -116,7 +117,7 @@ void alarmClock_setClockHour(Fsm *me, const Event *e) {
 void alarmClock_setClockMinute(Fsm *me, const Event *e) {
 	switch (e->signal) {
 		case ROTARY_SIG:
-			me->timeSet += MIN_IN_MS;
+			me->systemTime += MIN_IN_MS;
 			break;
 		case JOYSTICK_SIG:
 			me->state = alarmClock_clockRun;
@@ -128,17 +129,63 @@ void alarmClock_setClockMinute(Fsm *me, const Event *e) {
 
 void alarmClock_clockRun(Fsm *me, const Event *e) {
 
+	switch (e->signal) {
+		case ALARM_SIG:
+			me->state = alarmClock_ringAlarm;
+			break;
+		case ROTARY_SIG:
+			// toggle alarm
+			me->alarmSet = ~me->alarmSet;
+			break;
+		case JOYSTICK_SIG:
+			me->state = alarmClock_setAlarmHour;
+			break;
+		default:
+			break;
+	}
+
 }
 
 void alarmClock_setAlarmHour(Fsm *me, const Event *e) {
+	switch (e->signal) {
+		case ROTARY_SIG:
+			me->alarmTime += HOUR_IN_MS;
+			break;
+		case JOYSTICK_SIG:
+			me->state = alarmClock_setAlarmHour;
+			break;
+		default:
+			break;
+	}
 }
 
 void alarmClock_setAlarmMinute(Fsm *me, const Event *e) {
-
+	switch (e->signal) {
+		case ROTARY_SIG:
+			me->alarmTime += MIN_IN_MS;
+			break;
+		case JOYSTICK_SIG:
+			me->state = alarmClock_clockRun;
+			break;
+		default:
+			break;
+	}
 }
 
 void alarmClock_ringAlarm(Fsm *me, const Event *e) {
-
+	switch (e->signal) {
+		case TIMEOUT_SIG:
+			me->state = alarmClock_clockRun;
+			break;
+		case ROTARY_SIG:
+			me->state = alarmClock_clockRun;
+			break;
+		case JOYSTICK_SIG:
+			me->state = alarmClock_clockRun;
+			break;
+		default:
+			break;
+	}
 }
 
 int main(void) {
