@@ -16,6 +16,7 @@
 
 #define HOUR_IN_MS 3600000
 #define MIN_IN_MS    60000
+#define SEC_IN_MS     1000
 
 
 /* typedefs */
@@ -23,14 +24,10 @@ typedef struct Fsm Fsm;
 typedef struct Event Event;
 typedef void (*State) (Fsm *, const Event *);
 
-static Fsm fsm;
-
-
-
+static Fsm fsm_alarmClock;
 
 /* signals */
 enum { JOYSTICK_SIG, ROTARY_SIG, ALARM_SIG, TIMEOUT_SIG, EVENT_NONE};
-
 
 /* forward declarations */
 void alarmClock_setClockHour(Fsm *, const Event *);
@@ -40,11 +37,9 @@ void alarmClock_setAlarmHour(Fsm *, const Event *);
 void alarmClock_setAlarmMinute(Fsm *, const Event *);
 void alarmClock_ringAlarm(Fsm *, const Event *);
 
-
-
 struct Fsm {
 	State state;			// the current state
-	uint8_t alarmSet;		// is alarm enabled?
+	bool alarmSet;	// is alarm enabled?
 	uint32_t systemTime;	// temporary buffer for time
 	uint32_t alarmTime;		// temporary buffer for alarm
 };
@@ -64,16 +59,32 @@ inline static void fsm_init(Fsm *fsm, State init) {
 	fsm_dispatch(fsm, NULL);
 }
 
+/* called by ISR */
 void joystickCallback() {
 	Event e;
 	e.signal = JOYSTICK_SIG;
-	fsm_dispatch(&fsm, &e);
+	fsm_dispatch(&fsm_alarmClock, &e);
 }
 
+/* called by ISR */
 void rotaryCallback() {
 	Event e;
 	e.signal = ROTARY_SIG;
-	fsm_dispatch(&fsm, &e);
+	fsm_dispatch(&fsm_alarmClock, &e);
+}
+
+/* increments time every second */
+void updateSystemTime (void) {
+	Event e;
+	fsm_alarmClock.timeSet += SEC_IN_MS;
+	/* wrap around of time after 24 hours */
+	if (systemTime >= 24 * HOUR_IN_MS) {
+		systemTime = 0;
+	}
+	/* trigger alarm */
+	if (alarmTime >= systemTime) {
+		e.signal = ALARM_SIG;
+	}
 }
 
 /* all sub-initializations of hardware and fsm initial state */
@@ -87,19 +98,24 @@ void alarmClock_init(Fsm *me, Event *e) {
 	stdout = lcdout;
 	/* start scheduler */
 	scheduler_init();
+	if (scheduler_add(updateSystemTime, SEC_IN_MS, SEC_IN_MS)) {
+		led_redOn(); // red means error ;-)
+		exit(1); // no free slots
+	}
 	/* initialize buttons */
 	button_init();
 	button_setJoystickButtonCallback(joystickCallback);
 	button_setRotaryButtonCallback(rotaryCallback);
-	/* Globally enable Interrupts */
+	/* globally enable Interrupts */
 	sei();
 
 	/* initialize fsm */
-	// TODO set timeStruct
 	e->signal = EVENT_NONE;
 	me->state = (State) alarmClock_setClockHour;
+	me->systemTime = 0;
+	me->alarmTime = 0;
+	me->alarmSet = false;
 }
-
 
 void alarmClock_setClockHour(Fsm *me, const Event *e) {
 	switch (e->signal) {
@@ -189,7 +205,7 @@ void alarmClock_ringAlarm(Fsm *me, const Event *e) {
 }
 
 int main(void) {
-	fsm_init((Fsm*) &fsm, (void*)alarmClock_init);
+	fsm_init((Fsm*) &fsm_alarmClock, (void*)alarmClock_init);
 	while (1) {
 		scheduler_run();
 	}
