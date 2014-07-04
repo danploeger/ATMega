@@ -88,9 +88,10 @@ void updateSystemTime (void) {
 		fsm_alarmClock.systemTime = 0;
 	}
 	/* trigger alarm */
-	if (fsm_alarmClock.alarmTime >= fsm_alarmClock.systemTime) {
+	if ((fsm_alarmClock.alarmTime >= fsm_alarmClock.systemTime) & fsm_alarmClock.alarmSet) {
 		Event e;
 		e.signal = ALARM_SIG;
+		fsm_dispatch(&fsm_alarmClock, &e);
 	}
 }
 
