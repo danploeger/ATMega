@@ -35,6 +35,33 @@ struct type_time {
 /* FUNCTION PROTOTYPES *******************************************************/
 
 /**
+ * Returns system time in milliseconds
+ */
+uint32_t scheduler_getSystemTime();
+
+/**
+ * Sets system time in milliseconds
+ */
+void scheduler_setSystemTime(uint32_t newTime);
+
+/**
+ * Returns system time as time of day
+ */
+void scheduler_getTime(struct type_time *time);
+
+/**
+ * Sets system time from time of day
+ */
+void scheduler_setTime(const struct type_time *time);
+
+/**
+ * This function decreases the expire time of all tasks
+ * The expire time is decreased in an atomic block because the
+ * scheduler also accesses this variable
+ */
+void scheduler_update(void);
+
+/**
  * Initializes the task scheduler.
  */
 void scheduler_init();
@@ -55,15 +82,17 @@ void scheduler_run();
  */
 bool scheduler_add(task_t task, uint16_t expire, uint16_t period);
 
+
 /**
- * Removes a timer task from the scheduler.
+ * Iterates the global array 'tasks' to find the right task.
+ * If task is found it is set to NULL
  *
  * @param task	pointer to timer
  * */
 void scheduler_remove(task_t task);
 
 /**
- * Returns a task descriptor or NULL if task is not within scheduler tasks
+ * Returns a pointer to a task descriptor or NULL if task is not within schedulers tasks
  */
 taskDescriptor_t* scheduler_find(task_t task);
 

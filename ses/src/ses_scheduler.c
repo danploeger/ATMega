@@ -1,5 +1,7 @@
 /*INCLUDES *******************************************************************/
 #include "ses_timer.h"
+#include "ses_lcd.h"
+#include "ses_lcdDriver.h"
 #include "ses_scheduler.h"
 #include <util/atomic.h>
 #include <stdio.h>
@@ -14,9 +16,6 @@ volatile static uint32_t systemTime = 0;
 
 /*FUNCTION DEFINITION ********************************************************/
 
-/**
- * Returns system time in milliseconds
- */
 uint32_t scheduler_getSystemTime() {
 	uint32_t returnTime = 0;
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
@@ -25,16 +24,10 @@ uint32_t scheduler_getSystemTime() {
 	return returnTime;
 }
 
-/**
- * Sets system time in milliseconds
- */
 void scheduler_setSystemTime(uint32_t newTime) {
 	systemTime = newTime; // TODO: atomic
 }
 
-/**
- * Returns system time as time of day
- */
 void scheduler_getTime(struct type_time *time) {
 	uint32_t totalMillis = systemTime;
 	uint32_t totalSeconds = totalMillis / 1000;
@@ -49,9 +42,6 @@ void scheduler_getTime(struct type_time *time) {
 	}
 }
 
-/**
- * Sets system time from time of day
- */
 void scheduler_setTime(const struct type_time *time) {
 	uint8_t totalHours = time->hour;
 	uint16_t totalMinutes = totalHours * 60 + time->minute;
@@ -59,11 +49,6 @@ void scheduler_setTime(const struct type_time *time) {
 	systemTime = totalSeconds * 1000 + time->milli;
 }
 
-/**
- * This function decreases the expire time of all tasks
- * The expire time is decreased in an atomic block because the
- * scheduler also accesses this variable
- */
 void scheduler_update(void) {
 
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
@@ -139,12 +124,6 @@ void scheduler_run() {
 
 }
 
-/**
- * Iterates the global array 'tasks' until a free slot is found.
- * It adds the new tasks into this slot.
- *
- * If no free slot is found the function returns true
- */
 bool scheduler_add(task_t task, uint16_t expire, uint16_t period) {
 
 	/* create new task */
@@ -170,10 +149,6 @@ bool scheduler_add(task_t task, uint16_t expire, uint16_t period) {
 
 }
 
-/**
- * Iterates the global array 'tasks' to find the right task.
- * If task is found it is set to NULL
- */
 void scheduler_remove(task_t task) {
 
 	for(int i=0; i < SCHEDULER_ENTRIES; i++) {
@@ -185,9 +160,6 @@ void scheduler_remove(task_t task) {
 	}
 }
 
-/**
- * Returns a pointer to a task descriptor or NULL if task is not within schedulers tasks
- */
 taskDescriptor_t* scheduler_find(task_t task) {
 	for(int i=0; i < SCHEDULER_ENTRIES; i++) {
 		ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
