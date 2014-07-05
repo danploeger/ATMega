@@ -38,6 +38,7 @@ void alarmClock_setAlarmHour(Fsm *, const Event *);
 void alarmClock_setAlarmMinute(Fsm *, const Event *);
 void alarmClock_ringAlarm(Fsm *, const Event *);
 void displayTime(uint8_t, bool, bool);
+void timeoutAlarm(void);
 void updateSystemTime (void);
 
 /* STRUCT DEFINITIONS ********************************************************/
@@ -206,22 +207,8 @@ void displayTime(uint8_t line, bool alarmTime, bool showSeconds) {
 
 }
 
-/* callback called by ISR */
-void joystickCallback() {
-	Event e;
-	e.signal = JOYSTICK_SIG;
-	fsm_dispatch(&fsm_alarmClock, &e);
-}
-
-/* callback called by ISR */
-void rotaryCallback() {
-	Event e;
-	e.signal = ROTARY_SIG;
-	fsm_dispatch(&fsm_alarmClock, &e);
-}
-
 /* auxiliary function that stops the alarm after timeout */
-void timeoutAlarm() {
+void timeoutAlarm(void) {
 	if (fsm_alarmClock.state == alarmClock_ringAlarm) {
 		Event e;
 		e.signal = TIMEOUT_SIG;
@@ -247,6 +234,20 @@ void updateSystemTime (void) {
 		e.signal = ALARM_SIG;
 		fsm_dispatch(&fsm_alarmClock, &e);
 	}
+}
+
+/* callback called by ISR */
+void joystickCallback(void) {
+	Event e;
+	e.signal = JOYSTICK_SIG;
+	fsm_dispatch(&fsm_alarmClock, &e);
+}
+
+/* callback called by ISR */
+void rotaryCallback(void) {
+	Event e;
+	e.signal = ROTARY_SIG;
+	fsm_dispatch(&fsm_alarmClock, &e);
 }
 
 /* all sub-initializations of hardware and fsm initial state */
