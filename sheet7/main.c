@@ -12,6 +12,7 @@
 #include "ses_lcd.h"
 #include "ses_scheduler.h"
 #include <stdlib.h>
+#include <math.h>
 
 
 #define HOUR_IN_MS 3600000
@@ -36,7 +37,7 @@ void alarmClock_clockRun(Fsm *, const Event *);
 void alarmClock_setAlarmHour(Fsm *, const Event *);
 void alarmClock_setAlarmMinute(Fsm *, const Event *);
 void alarmClock_ringAlarm(Fsm *, const Event *);
-void displayTime(bool);
+void displayTime(uint8_t, bool, bool);
 
 
 struct Fsm {
@@ -77,20 +78,18 @@ void rotaryCallback() {
 
 /* increments time every second */
 void updateSystemTime (void) {
-	lcd_setCursor(0,0);
-	printf("Current time:");
 	/* increment system time by one second */
 	fsm_alarmClock.systemTime += SEC_IN_MS;
 
 	led_greenToggle();
-	displayTime(1);
+	displayTime(1, 0, true);
 
 	/* wrap around of time after 24 hours */
 	if (fsm_alarmClock.systemTime >= 24 * HOUR_IN_MS) {
 		fsm_alarmClock.systemTime = 0;
 	}
 	/* trigger alarm */
-	if ((fsm_alarmClock.alarmTime >= fsm_alarmClock.systemTime) && fsm_alarmClock.alarmSet && (fsm_alarmClock.state == alarmClock_clockRun)) {
+	if ( abs(fsm_alarmClock.alarmTime-fsm_alarmClock.systemTime)<1000 && fsm_alarmClock.alarmSet && (fsm_alarmClock.state == alarmClock_clockRun)) {
 		Event e;
 		e.signal = ALARM_SIG;
 		fsm_dispatch(&fsm_alarmClock, &e);
@@ -122,17 +121,17 @@ void alarmClock_init(Fsm *me, Event *e) {
 	me->systemTime = 0;
 	me->alarmTime = 0;
 	me->alarmSet = false;
+	fsm_dispatch(me, e);
 }
 
 void alarmClock_setClockHour(Fsm *me, const Event *e) {
 	lcd_setCursor(0,0);
-	printf("Set hour with rotary.");
-	lcd_setCursor(0,1);
-	printf("Cont. with joystick.");
+	printf("RB=Hour,JB=Cont");
+
 	switch (e->signal) {
 		case ROTARY_SIG:
 			me->systemTime += HOUR_IN_MS;
-			displayTime(0);
+			displayTime(1, 0, false);
 			break;
 		case JOYSTICK_SIG:
 			lcd_clear();
@@ -145,13 +144,11 @@ void alarmClock_setClockHour(Fsm *me, const Event *e) {
 
 void alarmClock_setClockMinute(Fsm *me, const Event *e) {
 	lcd_setCursor(0,0);
-	printf("Set min with rotary.");
-	lcd_setCursor(0,1);
-	printf("Cont. with joystick.");
+	printf("RB=Hour,JB=Cont");
 	switch (e->signal) {
 		case ROTARY_SIG:
 			me->systemTime += MIN_IN_MS;
-			displayTime(0);
+			displayTime(1, 0, false);
 			break;
 		case JOYSTICK_SIG:
 			if (scheduler_add(updateSystemTime, SEC_IN_MS, SEC_IN_MS)) {
@@ -176,7 +173,13 @@ void alarmClock_clockRun(Fsm *me, const Event *e) {
 			break;
 		case ROTARY_SIG:
 			// toggle alarm
-			me->alarmSet = ~me->alarmSet;
+			if(me->alarmSet) {
+				me->alarmSet = 0;
+			}
+			else {
+				me->alarmSet = 1;
+			}
+
 			me->alarmSet ? led_yellowOn() : led_yellowOff();
 			break;
 		case JOYSTICK_SIG:
@@ -190,17 +193,15 @@ void alarmClock_clockRun(Fsm *me, const Event *e) {
 
 void alarmClock_setAlarmHour(Fsm *me, const Event *e) {
 	lcd_setCursor(0,0);
-	printf("Set hour with rotary.");
-	lcd_setCursor(0,1);
-	printf("Cont. with joystick.");
+	printf("RB=Hour,JB=Cont");
 	switch (e->signal) {
 		case ROTARY_SIG:
 			me->alarmTime += HOUR_IN_MS;
-			displayTime(0);
+			displayTime(2, 1, false);
 			break;
 		case JOYSTICK_SIG:
 			lcd_clear();
-			me->state = alarmClock_setAlarmHour;
+			me->state = alarmClock_setAlarmMinute;
 			break;
 		default:
 			break;
@@ -209,13 +210,11 @@ void alarmClock_setAlarmHour(Fsm *me, const Event *e) {
 
 void alarmClock_setAlarmMinute(Fsm *me, const Event *e) {
 	lcd_setCursor(0,0);
-	printf("Set min with rotary.");
-	lcd_setCursor(0,1);
-	printf("Cont. with joystick.");
+	printf("RB=Min,JB=Cont");
 	switch (e->signal) {
 		case ROTARY_SIG:
 			me->alarmTime += MIN_IN_MS;
-			displayTime(0);
+			displayTime(2, 1, false);
 			break;
 		case JOYSTICK_SIG:
 			lcd_clear();
@@ -240,11 +239,16 @@ void alarmClock_ringAlarm(Fsm *me, const Event *e) {
 	}
 }
 
-void displayTime(bool showSeconds) {
+void displayTime(uint8_t line, bool alarmTime, bool showSeconds) {
 	time_t myTime;
-	scheduler_setSystemTime(fsm_alarmClock.systemTime);
+
+	if(alarmTime)
+		scheduler_setSystemTime(fsm_alarmClock.alarmTime);
+	else
+		scheduler_setSystemTime(fsm_alarmClock.systemTime);
+
 	scheduler_getTime(&myTime);
-	lcd_setCursor(0,3);
+	lcd_setCursor(0,line);
 
 	if(showSeconds)
 		printf("%.2d:%.2d:%.2d", myTime.hour, myTime.minute, myTime.second);
@@ -252,6 +256,7 @@ void displayTime(bool showSeconds) {
 		printf("%.2d:%.2d", myTime.hour, myTime.minute);
 
 }
+
 
 int main(void) {
 	/* globally enable Interrupts */
