@@ -19,18 +19,17 @@
 #define MIN_IN_MS    60000
 #define SEC_IN_MS     1000
 
-
-/* typedefs */
+/* TYPEDEFS AND PRIVATE DECLARATIONS *****************************************/
 typedef struct Fsm Fsm;
 typedef struct Event Event;
 typedef void (*State) (Fsm *, const Event *);
 
 static Fsm fsm_alarmClock;
 
-/* signals */
+/* SIGNALS *******************************************************************/
 enum { JOYSTICK_SIG, ROTARY_SIG, ALARM_SIG, TIMEOUT_SIG, EVENT_NONE};
 
-/* forward declarations */
+/* FORWARD DECLARATIONS ******************************************************/
 void alarmClock_setClockHour(Fsm *, const Event *);
 void alarmClock_setClockMinute(Fsm *, const Event *);
 void alarmClock_clockRun(Fsm *, const Event *);
@@ -39,7 +38,7 @@ void alarmClock_setAlarmMinute(Fsm *, const Event *);
 void alarmClock_ringAlarm(Fsm *, const Event *);
 void displayTime(uint8_t, bool, bool);
 
-
+/* STRUCT DEFINITIONS ********************************************************/
 struct Fsm {
 	State state;			// the current state
 	bool alarmSet;			// is alarm enabled?
@@ -50,6 +49,8 @@ struct Fsm {
 struct Event {
 	uint8_t signal;		// multi purpose signal
 } event;
+
+/* FUNCTION DEFINITION *******************************************************/
 
 /* dispatches events to state machine, called in application */
 inline static void fsm_dispatch(Fsm *fsm, const Event* event) {
