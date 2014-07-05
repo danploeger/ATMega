@@ -1,0 +1,37 @@
+@startuml
+
+state setAlarmHour
+state setAlarmMinute
+state ringAlarm
+
+[*] --> setClockHour : / 00:00 & Ask for time
+
+setClockHour --> setClockHour : ROTARY_SIG & \n!(hour<24) / \nhour=0 
+setClockHour --> setClockHour : ROTARY_SIG & \nhour < 24 / \nhour++ 
+setClockHour --> setClockMinute : JOYSTICK_SIG / XX:00
+setClockMinute --> setClockMinute : ROTARY_SIG & !(minute<60) / \nminute=0
+setClockMinute --> setClockMinute : ROTARY_SIG & minute< 60 / \nminute++
+setClockMinute --> clockRun : JOYSTICK_SIG  / \nXX:XX:00
+
+
+clockRun --> setAlarmHour : JOYSTICK_SIG / \nXX:XX & Ask for alarm time
+
+
+setAlarmHour --> setAlarmHour : ROTARY_SIG & \n!(hour<24) / \nhour=0 
+setAlarmHour --> setAlarmHour : ROTARY_SIG & \nhour < 24 / \nhour++ 
+setAlarmHour --> setAlarmMinute : JOYSTICK_SIG / \nXX:XX
+setAlarmMinute --> setAlarmMinute : ROTARY_SIG & !(minute<60) / \nminute=0
+setAlarmMinute --> setAlarmMinute : ROTARY_SIG & minute< 60 / \nminute++
+
+setAlarmMinute --> clockRun : JOYSTICK_SIG / \nXX:XX
+
+
+clockRun --> ringAlarm : time_alarm=time & toggle_alarm=true / \nbuzzer_start & led_red_flash
+ringAlarm --> clockRun : ROTARY_SIG|JOYSTICK_SIG|after 5s / \nbuzzer_stop & !led_red_flash
+clockRun --> clockRun : after 1s / second++ & led_green_toggle
+clockRun --> clockRun : ROTARY_SIG / \nbool toggle_alarm = toggle& led_yellow_toggle
+
+
+
+
+@enduml
