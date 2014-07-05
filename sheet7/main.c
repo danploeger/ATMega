@@ -94,7 +94,7 @@ void alarmClock_setClockMinute(Fsm *me, const Event *e) {
 			break;
 		case JOYSTICK_SIG:
 			if (scheduler_add(updateSystemTime, SEC_IN_MS, SEC_IN_MS)) {
-				led_redOn(); // red means error ;-)
+				led_redOn(); // red means error
 				exit(1); // no free slots
 			}
 			lcd_clear();
@@ -110,8 +110,14 @@ void alarmClock_clockRun(Fsm *me, const Event *e) {
 	switch (e->signal) {
 		case ALARM_SIG:
 			startAlarm();
-			scheduler_add(led_redToggle, 100, 100);
-			scheduler_add(timeoutAlarm, EXPIRY_TIME, 0);
+			if (scheduler_add(led_redToggle, 100, 100)) {
+				led_redOn(); // red means error
+				exit(1); // no free slots
+			}
+			if (scheduler_add(timeoutAlarm, EXPIRY_TIME, 0)) {
+				led_redOn(); // red means error
+				exit(1); // no free slots
+			}
 			me->state = alarmClock_ringAlarm;
 			break;
 		case ROTARY_SIG:
@@ -183,12 +189,13 @@ void alarmClock_ringAlarm(Fsm *me, const Event *e) {
 	}
 }
 
-/** auxiliary function for display output of the time.
+/**
+ * auxiliary function for display output of the time.
  * Parameters:
  * uint8_t line: # of printed line,
  * bool alarmTime: display of alarm time instead of clock time
  * bool showSeconds: displayed format HH:MM:SS instead of HH:MM
- */
+ **/
 void displayTime(uint8_t line, bool alarmTime, bool showSeconds) {
 	time_t myTime;
 
@@ -284,6 +291,11 @@ int main(void) {
 	fsm_init((Fsm*) &fsm_alarmClock, (void*)alarmClock_init);
 	while (1) {
 		scheduler_run();
+		// TODO: fsm (display) not properly updated because of following missing line:
+		//
+		// fsm_dispatch(&fsm_alarmClock, &e);
+		//
+		// not implemented because of lack of testing opportunities on an ATmega board
 	}
 	return 0;
 }
